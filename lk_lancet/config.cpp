@@ -25,6 +25,9 @@ class CfgPatches
 			"m_izdelie_dummy",
 			"izdelie_dummy_mag",
 			"m_geran_dummy",
+			"lancet_geran_uav_o",
+			"lancet_geran_uav_b",
+			"lancet_geran_uav_i",
 			"Geran_AmmoBox",
 			"Lancet_Tripod_Bag_Weapon",
 			"Lancet_Tripod_Bag_Support",
@@ -346,6 +349,30 @@ class DefaultVehicleSystemsDisplayManagerRight
 };
 class CfgVehicles
 {
+	class O_uav_lancet3;
+	class B_uav_lancet3;
+	class I_uav_lancet3;
+	class lancet_geran_uav_o: O_uav_lancet3
+	{
+		scope=1;
+		scopeCurator=0;
+		displayName="Geran-2";
+		model="\lk_lancet\shahed4.p3d";
+	};
+	class lancet_geran_uav_b: B_uav_lancet3
+	{
+		scope=1;
+		scopeCurator=0;
+		displayName="Geran-2";
+		model="\lk_lancet\shahed4.p3d";
+	};
+	class lancet_geran_uav_i: I_uav_lancet3
+	{
+		scope=1;
+		scopeCurator=0;
+		displayName="Geran-2";
+		model="\lk_lancet\shahed4.p3d";
+	};
 	class All
 	{
 	};

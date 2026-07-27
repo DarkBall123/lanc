@@ -7,14 +7,24 @@ private _muzzlePos = AGLToASL (_unit modelToWorld (_unit selectionPosition "usti
 private _launchPos = _muzzlePos vectorAdd (_basePos vectorFromTo _muzzlePos);
 private _uav = _uavType createVehicle _launchPos;
 _uav setPosASL _launchPos;
-
-if (!_isGeran) then {
-    [_uav, true] remoteExec ["hideObjectGlobal", 2];
-};
+_uav hideObject true;
+[_uav, true] remoteExec ["hideObjectGlobal", 2];
 
 private _uavTempType = "";
 
 switch (true) do {
+    case ((side _gunner == INDEPENDENT) && {_isGeran}): {
+        _uavTempType = "lancet_geran_uav_i";
+    };
+
+    case ((side _gunner == EAST) && {_isGeran}): {
+        _uavTempType = "lancet_geran_uav_o";
+    };
+
+    case ((side _gunner == WEST) && {_isGeran}): {
+        _uavTempType = "lancet_geran_uav_b";
+    };
+
     case ((side _gunner == INDEPENDENT) && {!_isIzdelie}): {
         _uavTempType = "I_uav_lancet3";
     };
@@ -42,11 +52,6 @@ switch (true) do {
 
 private _uavTemp = _uavTempType createVehicle _launchPos;
 createVehicleCrew _uavTemp;
-
-if (_isGeran) then {
-    _uavTemp hideObject true;
-    [_uavTemp, true] remoteExec ["hideObjectGlobal", 2];
-};
 
 if (local _uavTemp) then {
     _uavTemp lockDriver true;
