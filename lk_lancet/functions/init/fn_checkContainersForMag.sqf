@@ -1,17 +1,18 @@
 params ["_object"];
 
 private _playerPos = getPosATL _object;
+private _objectType = typeOf _object;
+
+if ((_objectType find "geran") > -1) exitWith {
+    (nearestObjects [_playerPos, ["Geran_AmmoBox"], 15]) isNotEqualTo []
+};
+
 private _containers = nearestObjects [_playerPos, ["All"], 15];
 private _found = false;
-private _objectType = typeOf _object;
 private _magType = "lancet_dummy_mag";
 
 if ((_objectType find "izdelie") > -1) then {
     _magType = "izdelie_dummy_mag";
-};
-
-if ((_objectType find "geran") > -1) then {
-    _magType = "geran_dummy_mag";
 };
 
 {

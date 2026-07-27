@@ -25,7 +25,7 @@ class CfgPatches
 			"m_izdelie_dummy",
 			"izdelie_dummy_mag",
 			"m_geran_dummy",
-			"geran_dummy_mag",
+			"Geran_AmmoBox",
 			"Lancet_Tripod_Bag_Weapon",
 			"Lancet_Tripod_Bag_Support",
 			"lancet_tripod_launcher_o",
@@ -119,6 +119,13 @@ class cfgammo
 	{
 		modelspecial="\lk_lancet\shahed4.p3d";
 		model="\lk_lancet\shahed4.p3d";
+		soundFly[]=
+		{
+			"A3\Sounds_F\air\UAV_02\UAV_02_low_ext",
+			1.5,
+			0.8,
+			1200
+		};
 	};
 };
 class cfgMagazines
@@ -146,14 +153,6 @@ class cfgMagazines
 		scope=2;
 		picture="\lk_lancet\pictures\izdelie53.paa";
 		count = 4;
-	};
-	class geran_dummy_mag: lancet_dummy_mag
-	{
-		modelspecial="\lk_lancet\shahed4.p3d";
-		model="\lk_lancet\shahed4.p3d";
-		displayname="Geran-2 Loitering Ammunition";
-		ammo="m_geran_dummy";
-		picture="\lk_lancet\textures\icon_ca.paa";
 	};
 };
 class CfgWeapons
@@ -323,8 +322,7 @@ class CfgWeapons
 		magazines[]+=
 		{
 			"lancet_dummy_mag",
-			"izdelie_dummy_mag",
-			"geran_dummy_mag"
+			"izdelie_dummy_mag"
 		};
 	};
 };
@@ -701,7 +699,7 @@ class CfgVehicles
 		{
 			class ReloadAction: ReloadAction
 			{
-				condition="(vehicle player == player) && (not (this getVariable ['lancet_isAssembleing', false])) && (not (someAmmo this)) && ((this call lancet_fnc_checkContainersForMag) || ('geran_dummy_mag' in magazines player))";
+				condition="(vehicle player == player) && (not (this getVariable ['lancet_isAssembleing', false])) && (not (someAmmo this)) && (this call lancet_fnc_checkContainersForMag)";
 			};
 		};
 	};
@@ -769,6 +767,7 @@ class CfgVehicles
 		};
 	};
 	class Box_EAF_WpsSpecial_F;
+	class Box_IND_AmmoVeh_F;
 	class Lancet_AmmoBox: Box_EAF_WpsSpecial_F
 	{
 		scope=2;
@@ -780,6 +779,21 @@ class CfgVehicles
 			class LancetBox_Init
 			{
 				init="clearItemCargoGlobal (_this # 0); clearMagazineCargoGlobal (_this # 0); clearWeaponCargoGlobal (_this # 0); (_this # 0) addItemCargoGlobal ['lancet_dummy_mag', 1];";
+			};
+		};
+	};
+	class Geran_AmmoBox: Box_IND_AmmoVeh_F
+	{
+		scope=2;
+		scopecurator=2;
+		author="DarkBall";
+		displayName="Geran-2 Transport Crate";
+		maximumLoad=0;
+		class EventHandlers
+		{
+			class GeranBox_Init
+			{
+				init="clearItemCargoGlobal (_this # 0); clearMagazineCargoGlobal (_this # 0); clearWeaponCargoGlobal (_this # 0); clearBackpackCargoGlobal (_this # 0);";
 			};
 		};
 	};

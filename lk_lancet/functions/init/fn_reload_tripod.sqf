@@ -21,8 +21,23 @@ private _removeMagazineFromContainer = {
 };
 
 private _playerPos = getPosATL _object;
-private _containers = nearestObjects [_playerPos, ["All"], 15];
 private _objectType = typeOf _object;
+
+if ((_objectType find "geran") > -1) exitWith {
+    private _boxes = nearestObjects [_playerPos, ["Geran_AmmoBox"], 15];
+
+    if (_boxes isNotEqualTo []) then {
+        private _box = _boxes # 0;
+
+        if !(_box getVariable ["lancet_isConsumed", false]) then {
+            _box setVariable ["lancet_isConsumed", true, true];
+            deleteVehicle _box;
+            _object setVehicleAmmo 1;
+        };
+    };
+};
+
+private _containers = nearestObjects [_playerPos, ["All"], 15];
 private _isIzdelie = (_objectType find "izdelie") > -1;
 private _magType = "lancet_dummy_mag";
 private _factor = 1;
@@ -30,10 +45,6 @@ private _factor = 1;
 if (_isIzdelie) then {
     _magType = "izdelie_dummy_mag";
     _factor = 0.25;
-};
-
-if ((_objectType find "geran") > -1) then {
-    _magType = "geran_dummy_mag";
 };
 
 private _currentAmmo = (((magazinesAmmo _object) # 0) # 1) / 4;
