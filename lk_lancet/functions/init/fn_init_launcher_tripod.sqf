@@ -32,7 +32,9 @@ _launchPos = _muzzlePos vectorAdd (_basePos vectorFromTo _muzzlePos);
 _uav = _uavType createVehicle _launchPos;
 _uav setPosASL _launchPos;
 
-[_uav, true] remoteExec ["hideObjectGlobal", 2];
+if (!_isGeran) then {
+    [_uav, true] remoteExec ["hideObjectGlobal", 2];
+};
 
 private _uav_temp_type = "";
 
@@ -64,6 +66,11 @@ switch (true) do {
 
 private _uav_temp = _uav_temp_type createVehicle _launchPos;
 createVehicleCrew _uav_temp;
+
+if (_isGeran) then {
+    _uav_temp hideObject true;
+    [_uav_temp, true] remoteExec ["hideObjectGlobal", 2];
+};
 
 if (local _uav_temp) then {
 	_uav_temp lockDriver true;
