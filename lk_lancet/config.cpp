@@ -129,7 +129,106 @@ class cfgammo
 			1,
 			2000
 		};
-		lancet_speedArray[]={100,60,10,1000,1};
+		soundHit1[]=
+		{
+			"A3\Sounds_F\weapons\Explosion\expl_big_1",
+			2.5118864,
+			1,
+			2400
+		};
+		soundHit2[]=
+		{
+			"A3\Sounds_F\weapons\Explosion\expl_big_2",
+			2.5118864,
+			1,
+			2400
+		};
+		soundHit3[]=
+		{
+			"A3\Sounds_F\weapons\Explosion\expl_big_3",
+			2.5118864,
+			1,
+			2400
+		};
+		soundHit4[]=
+		{
+			"A3\Sounds_F\weapons\Explosion\expl_shell_1",
+			2.5118864,
+			1,
+			2400
+		};
+		soundHit5[]=
+		{
+			"A3\Sounds_F\weapons\Explosion\expl_shell_2",
+			2.5118864,
+			1,
+			2400
+		};
+		multiSoundHit[]=
+		{
+			"soundHit1",
+			0.2,
+			"soundHit2",
+			0.2,
+			"soundHit3",
+			0.2,
+			"soundHit4",
+			0.2,
+			"soundHit5",
+			0.2
+		};
+		warheadName="HE";
+		hit=460;
+		indirectHit=230;
+		indirectHitRange=38;
+		dangerRadiusHit=850;
+		explosionDir="explosionDir";
+		explosionEffects="HeavyBombExplosion";
+		explosionEffectsDir="explosionDir";
+		explosionForceCoef=1;
+		explosionPos="explosionPos";
+		explosionSoundEffect="DefaultExplosion";
+		explosionType="explosive";
+		explosive=0.8;
+		cost=1200;
+		craterEffects="HeavyBombCrater";
+		craterShape="";
+		craterWaterEffects="ImpactEffectsWater";
+		trackOversteer=1;
+		trackLead=0.95;
+		maneuvrability=20;
+		explosionTime=0;
+		fuseDistance=100;
+		whistleDist=500;
+		class CamShakeExplode
+		{
+			power=46;
+			duration=3;
+			frequency=20;
+			distance=361.32599;
+		};
+		class CamShakeHit
+		{
+			power=230;
+			duration=0.8;
+			frequency=20;
+			distance=1;
+		};
+		class CamShakeFire
+		{
+			power=3.89432;
+			duration=3;
+			frequency=20;
+			distance=121.326;
+		};
+		class CamShakePlayerFire
+		{
+			power=5;
+			duration=0.1;
+			frequency=20;
+			distance=1;
+		};
+		lancet_speedArray[]={150,90,10,1000,1};
 	};
 };
 class cfgMagazines

@@ -89,27 +89,26 @@ _uav setVehicleAmmo 0;
 [_uav, [25, 0, direction _uav]] call lancet_fnc_setAngleOfAttack;
 
 private _direction = direction _uav;
-private _speed = 60;
+private _launchSpeed = if (_isGeran) then {90} else {60};
 _uav setVelocity [
-    sin _direction * _speed,
-    cos _direction * _speed,
+    sin _direction * _launchSpeed,
+    cos _direction * _launchSpeed,
     50 + _verticalAngle
 ];
 _uav setDamage 0;
 
 [_unit, _uav] call lancet_fnc_initMissile;
 
-[_uav, _verticalAngle] spawn {
-    params ["_uav", "_verticalAngle"];
+[_uav, _verticalAngle, _launchSpeed] spawn {
+    params ["_uav", "_verticalAngle", "_launchSpeed"];
 
     for "_i" from 1 to 5 do {
         [_uav, [25, 0, direction _uav]] call lancet_fnc_setAngleOfAttack;
 
         private _direction = direction _uav;
-        private _speed = 60;
         _uav setVelocity [
-            sin _direction * _speed,
-            cos _direction * _speed,
+            sin _direction * _launchSpeed,
+            cos _direction * _launchSpeed,
             25 + _verticalAngle
         ];
         _uav setDamage 0;
