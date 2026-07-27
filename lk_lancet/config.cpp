@@ -121,11 +121,12 @@ class cfgammo
 		model="\lk_lancet\shahed4.p3d";
 		soundFly[]=
 		{
-			"A3\Sounds_F\air\UAV_02\UAV_02_low_ext",
-			1.5,
-			0.8,
-			1200
+			"A3\Sounds_F_Jets\vehicles\air\UAV_05\B_UAV_05_engine_low_ext",
+			4.5,
+			1,
+			2000
 		};
+		lancet_speedArray[]={100,60,10,1000,1};
 	};
 };
 class cfgMagazines
@@ -695,11 +696,28 @@ class CfgVehicles
 		_generalmacro="geran_tripod_launcher";
 		displayName="Geran-2 Tripod Launcher";
 		editorPreview="\lk_lancet\textures\preview_shahed.jpg";
+		class assembleInfo
+		{
+			primary=0;
+			base="";
+			assembleTo="";
+			dissasembleTo[]={};
+			displayName="";
+		};
 		class UserActions: UserActions
 		{
 			class ReloadAction: ReloadAction
 			{
+				displayName="Load Geran-2";
 				condition="(vehicle player == player) && (not (this getVariable ['lancet_isAssembleing', false])) && (not (someAmmo this)) && (this call lancet_fnc_checkContainersForMag)";
+				statement="current_tripod = this; this setVariable ['lancet_isAssembleing', true, true]; ['Loading the Geran-2', 30, {player playMoveNow 'AinvPknlMstpSnonWnonDnon_medic_1'; alive player}, {current_tripod call lancet_fnc_reload_tripod}, {current_tripod setVariable ['lancet_isAssembleing', false, true]}] call CBA_fnc_progressBar;";
+			};
+		};
+		class EventHandlers: EventHandlers
+		{
+			class Lancet_Handlers: Lancet_Handlers
+			{
+				fired="_this spawn lancet_fnc_init_launcher_tripod; playSound3D ['\lk_lancet\tripod\zapusk.ogg', _this # 0, false, getPosASL (_this # 0), 5]";
 			};
 		};
 	};

@@ -2,7 +2,7 @@ if(!(alive player)) exitWith {};
 
 params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile"];
 
-_gunner = (getShotParents _projectile) # 1;
+private _gunner = (getShotParents _projectile) # 1;
 
 deleteVehicle _projectile;
 
@@ -11,10 +11,7 @@ private _player = missionNamespace getVariable ["bis_fnc_moduleRemoteControl_uni
 
 if(_gunner != _player) exitWith {};
 
-_unitType = typeOf _unit;
-
-_basePos = AGLToASL (_unit modelToWorld (_unit selectionPosition "konec hlavne"));
-_muzzlePos = AGLToASL (_unit modelToWorld (_unit selectionPosition "usti hlavne"));
+private _unitType = typeOf _unit;
 
 private _isIzdelie = (_unitType find "izdelie") > -1;
 private _isGeran = (_unitType find "geran") > -1;
@@ -26,10 +23,15 @@ if (_isIzdelie) then {
 
 if (_isGeran) then {
     _uavType = "m_geran_dummy";
+    sleep 19;
 };
 
-_launchPos = _muzzlePos vectorAdd (_basePos vectorFromTo _muzzlePos);
-_uav = _uavType createVehicle _launchPos;
+if (!alive _unit || {!alive _gunner}) exitWith {};
+
+private _basePos = AGLToASL (_unit modelToWorld (_unit selectionPosition "konec hlavne"));
+private _muzzlePos = AGLToASL (_unit modelToWorld (_unit selectionPosition "usti hlavne"));
+private _launchPos = _muzzlePos vectorAdd (_basePos vectorFromTo _muzzlePos);
+private _uav = _uavType createVehicle _launchPos;
 _uav setPosASL _launchPos;
 
 if (!_isGeran) then {
