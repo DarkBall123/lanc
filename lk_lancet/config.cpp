@@ -713,13 +713,6 @@ class CfgVehicles
 				statement="current_tripod = this; this setVariable ['lancet_isAssembleing', true, true]; ['Loading the Geran-2', 30, {player playMoveNow 'AinvPknlMstpSnonWnonDnon_medic_1'; alive player}, {current_tripod call lancet_fnc_reload_tripod}, {current_tripod setVariable ['lancet_isAssembleing', false, true]}] call CBA_fnc_progressBar;";
 			};
 		};
-		class EventHandlers: EventHandlers
-		{
-			class Lancet_Handlers: Lancet_Handlers
-			{
-				fired="_this spawn lancet_fnc_init_launcher_tripod; playSound3D ['\lk_lancet\tripod\zapusk.ogg', _this # 0, false, getPosASL (_this # 0), 5]";
-			};
-		};
 	};
 
 	class geran_tripod_launcher_o: geran_tripod_launcher
@@ -827,6 +820,9 @@ class CfgFunctions
 			{
 			};
 			class init_launcher_tripod
+			{
+			};
+			class launch_tripod_projectile
 			{
 			};
 			class checkContainersForMag
