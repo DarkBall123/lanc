@@ -1,5 +1,11 @@
 params ["_unit", "_gunner", "_uavType", "_isIzdelie", "_isGeran"];
 
+if (_isGeran) then {
+    _unit setVariable ["lancet_launchPending", false, true];
+    _unit setVariable ["lancet_keepLoadedVisual", false, true];
+    _unit animateSource ["tubel_hide_full", 1, true];
+};
+
 if (!alive _unit || {!alive _gunner}) exitWith {};
 
 private _basePos = AGLToASL (_unit modelToWorld (_unit selectionPosition "konec hlavne"));
@@ -97,7 +103,8 @@ _uav setVelocity [
 ];
 _uav setDamage 0;
 
-[_unit, _uav] call lancet_fnc_initMissile;
+private _controlUnits = if (_isGeran) then {[_gunner]} else {[]};
+[_unit, _uav, [], 0.65, "lancet_seeker", _controlUnits] call lancet_fnc_initMissile;
 
 [_uav, _verticalAngle, _launchSpeed] spawn {
     params ["_uav", "_verticalAngle", "_launchSpeed"];

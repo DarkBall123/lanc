@@ -27,6 +27,9 @@ if (_isGeran) then {
 private _launchArgs = [_unit, _gunner, _uavType, _isIzdelie, _isGeran];
 
 if (_isGeran) then {
+    _unit setVariable ["lancet_launchPending", true, true];
+    _unit setVariable ["lancet_keepLoadedVisual", true, true];
+    _unit animateSource ["tubel_hide_full", 0, true];
     [lancet_fnc_launch_tripod_projectile, _launchArgs, 19] call CBA_fnc_waitAndExecute;
 } else {
     _launchArgs call lancet_fnc_launch_tripod_projectile;

@@ -3,9 +3,14 @@ _projectile = param[1, objNull];
 _speedArr 	= param[2, []];
 _offset 	= param[3, 0.65];
 _interface 	= param[4, "lancet_seeker"];
+private _controlUnits = param[5, []];
 
 //Add the action to the unit and it's vehicle if the unit is inside one
-private _unitsAction = crew (vehicle _unit);
+private _unitsAction = if (_controlUnits isEqualTo []) then {
+	crew (vehicle _unit)
+} else {
+	_controlUnits
+};
 //_unitsAction pushBackUnique (vehicle _unit);
 
 //Init
@@ -77,5 +82,3 @@ if(isTouchingGround _unit) then {
 		[_id, "onEachFrame"] call BIS_fnc_removeStackedEventHandler;
 	};
 };
-
-

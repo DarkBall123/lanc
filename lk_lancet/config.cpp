@@ -835,7 +835,7 @@ class CfgVehicles
 			class ReloadAction: ReloadAction
 			{
 				displayName="Load Geran-2";
-				condition="(vehicle player == player) && (not (this getVariable ['lancet_isAssembleing', false])) && (not (someAmmo this)) && (this call lancet_fnc_checkContainersForMag)";
+				condition="(vehicle player == player) && (not (this getVariable ['lancet_isAssembleing', false])) && (not (this getVariable ['lancet_launchPending', false])) && (not (someAmmo this)) && (this call lancet_fnc_checkContainersForMag)";
 				statement="current_tripod = this; this setVariable ['lancet_isAssembleing', true, true]; ['Loading the Geran-2', 30, {player playMoveNow 'AinvPknlMstpSnonWnonDnon_medic_1'; alive player}, {current_tripod call lancet_fnc_reload_tripod}, {current_tripod setVariable ['lancet_isAssembleing', false, true]}] call CBA_fnc_progressBar;";
 			};
 		};
