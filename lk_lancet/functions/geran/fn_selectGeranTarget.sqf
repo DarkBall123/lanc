@@ -7,6 +7,7 @@ if (
 	|| {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
 ) exitWith {false};
 
+private _wasDiving = (_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "DIVE";
 private _config = configOf _projectile;
 private _detectionRange = getNumber (_config >> "geranDetectionRange");
 if (_detectionRange <= 0) then {
@@ -164,7 +165,7 @@ _projectile setVariable ["lancet_geran_turnSpeed", 0];
 [_projectile] call lancet_fnc_guideGeran;
 
 private _camera = uiNamespace getVariable ["lancet_geran_camera", objNull];
-if (!isNull _camera) then {
+if (!isNull _camera && {!_wasDiving}) then {
 	private _userFov = uiNamespace getVariable ["lancet_geran_userFov", 0.75];
 	private _pulse = (uiNamespace getVariable ["lancet_geran_fovPulse", 0]) + 1;
 

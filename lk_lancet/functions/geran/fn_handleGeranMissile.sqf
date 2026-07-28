@@ -530,8 +530,8 @@ while {alive _projectile && {!isNull _display}} do {
 	private _cursorY = _mouseY - safeZoneY;
 	private _gapX = 3 * pixelW;
 	private _gapY = 3 * pixelH;
-	private _armWidth = 12 * pixelW;
-	private _armHeight = 12 * pixelH;
+	private _armWidth = 18 * pixelW;
+	private _armHeight = 18 * pixelH;
 	private _cursorPositions = [
 		[_cursorX - _gapX - _armWidth, _cursorY - (2 * pixelH), _armWidth, 4 * pixelH],
 		[_cursorX + _gapX, _cursorY - (2 * pixelH), _armWidth, 4 * pixelH],
