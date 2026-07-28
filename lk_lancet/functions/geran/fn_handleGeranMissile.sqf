@@ -528,8 +528,8 @@ while {alive _projectile && {!isNull _display}} do {
 	getMousePosition params ["_mouseX", "_mouseY"];
 	private _cursorX = _mouseX - safeZoneX;
 	private _cursorY = _mouseY - safeZoneY;
-	private _gapX = 3 * pixelW;
-	private _gapY = 3 * pixelH;
+	private _gapX = 11 * pixelW;
+	private _gapY = 11 * pixelH;
 	private _armWidth = 18 * pixelW;
 	private _armHeight = 18 * pixelH;
 	private _cursorPositions = [
