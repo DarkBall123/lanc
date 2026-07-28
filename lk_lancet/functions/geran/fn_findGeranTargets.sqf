@@ -17,9 +17,57 @@ private _scored = [];
 	if (alive _x && {!isObjectHidden _x}) then {
 		private _bounds = boundingBoxReal _x;
 		private _centerModel = ((_bounds # 0) vectorAdd (_bounds # 1)) vectorMultiply 0.5;
-		private _screenPosition = worldToScreen (_x modelToWorldVisual _centerModel);
+		private _eligible = true;
 
-		if (_screenPosition isNotEqualTo []) then {
+		if (_x isKindOf "Ship") then {
+			_eligible = simulationEnabled _x;
+
+			if (_eligible) then {
+				private _topModel = [
+					_centerModel # 0,
+					_centerModel # 1,
+					(_bounds # 1) # 2
+				];
+				private _topASL = AGLToASL (_x modelToWorldVisual _topModel);
+				_eligible = (_topASL # 2) > 0.05;
+
+				if (_eligible) then {
+					private _sensorASL = getPosASLVisual _projectile;
+					private _centerASL = AGLToASL (_x modelToWorldVisual _centerModel);
+					private _rayDirection = vectorNormalized (_centerASL vectorDiff _sensorASL);
+					private _rayEndASL = _centerASL vectorAdd (_rayDirection vectorMultiply 10);
+					private _hits = lineIntersectsSurfaces [
+						_sensorASL,
+						_rayEndASL,
+						_projectile,
+						_visualUav,
+						true,
+						1,
+						"VIEW",
+						"GEOM"
+					];
+
+					if (_hits isEqualTo []) then {
+						_eligible = false;
+					} else {
+						private _firstHit = _hits # 0;
+						private _hitObject = _firstHit # 2;
+						private _hitParent = _firstHit # 3;
+						_eligible = (_hitObject isEqualTo _x) || {_hitParent isEqualTo _x};
+					};
+				};
+			};
+		};
+
+		if (_eligible) then {
+			private _screenPosition = worldToScreen (_x modelToWorldVisual _centerModel);
+
+			if (_screenPosition isEqualTo []) then {
+				_eligible = false;
+			};
+		};
+
+		if (_eligible) then {
 			private _confidence = [_projectile, _x, _thermal, _range] call lancet_fnc_getGeranConfidence;
 
 			if (_confidence >= 0.4) then {

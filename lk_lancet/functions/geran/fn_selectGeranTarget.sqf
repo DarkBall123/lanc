@@ -4,6 +4,7 @@ if (
 	isNull _projectile
 	|| {!alive _projectile}
 	|| {_projectile getVariable ["lancet_geran_terminalLocked", false]}
+	|| {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
 ) exitWith {false};
 
 private _config = configOf _projectile;
@@ -150,6 +151,7 @@ if (!isNull _targetObject) then {
 if (_targetPointASL isEqualTo []) exitWith {false};
 
 _projectile setVariable ["lancet_geran_targetObject", _targetObject];
+_projectile setVariable ["lancet_geran_objectTarget", !isNull _targetObject];
 _projectile setVariable ["lancet_geran_targetOffsetModel", _targetOffsetModel];
 _projectile setVariable ["lancet_geran_aimPointASL", _targetPointASL];
 _projectile setVariable ["lancet_geran_lastKnownASL", _targetPointASL];
@@ -157,6 +159,7 @@ _projectile setVariable ["lancet_geran_targetVisible", !isNull _targetObject];
 _projectile setVariable ["lancet_geran_terminalLocked", false];
 _projectile setVariable ["lancet_geran_guidanceMode", "DIVE"];
 _projectile setVariable ["lancet_geran_nextTrackCheck", 0];
+_projectile setVariable ["lancet_geran_turnSpeed", 0];
 
 [_projectile] call lancet_fnc_guideGeran;
 

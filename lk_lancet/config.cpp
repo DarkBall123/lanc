@@ -1207,14 +1207,6 @@ class LancetGeranLine: RscText
 	colorBackground[]={1,0.78,0.05,0.9};
 	shadow=0;
 };
-class LancetGeranText: RscText
-{
-	font="EtelkaMonospacePro";
-	sizeEx="0.026 * safezoneH";
-	colorText[]={1,0.82,0.18,0.9};
-	colorBackground[]={0,0,0,0};
-	shadow=0;
-};
 class geran_seeker
 {
 	idd=GERAN_IDD_SEEKER;
@@ -1231,85 +1223,39 @@ class geran_seeker
 			h="safeZoneH";
 			class Controls
 			{
-				class CornerTopLeftH: LancetGeranLine
+				class CursorShadowLeft: LancetGeranLine
 				{
-					x="0.025 * safezoneW";
-					y="0.035 * safezoneH";
-					w="0.09 * safezoneW";
-					h="1.5 * pixelH";
-					colorBackground[]={1,0.78,0.05,0.35};
+					idc=GERAN_IDC_CURSOR_SHADOW_LEFT;
+					colorBackground[]={0.01,0.015,0.02,0.78};
 				};
-				class CornerTopLeftV: LancetGeranLine
+				class CursorShadowRight: CursorShadowLeft
 				{
-					x="0.025 * safezoneW";
-					y="0.035 * safezoneH";
-					w="1.5 * pixelW";
-					h="0.09 * safezoneH";
-					colorBackground[]={1,0.78,0.05,0.35};
+					idc=GERAN_IDC_CURSOR_SHADOW_RIGHT;
 				};
-				class CornerTopRightH: LancetGeranLine
+				class CursorShadowTop: CursorShadowLeft
 				{
-					x="0.885 * safezoneW";
-					y="0.035 * safezoneH";
-					w="0.09 * safezoneW";
-					h="1.5 * pixelH";
-					colorBackground[]={1,0.78,0.05,0.35};
+					idc=GERAN_IDC_CURSOR_SHADOW_TOP;
 				};
-				class CornerTopRightV: LancetGeranLine
+				class CursorShadowBottom: CursorShadowLeft
 				{
-					x="0.975 * safezoneW - 1.5 * pixelW";
-					y="0.035 * safezoneH";
-					w="1.5 * pixelW";
-					h="0.09 * safezoneH";
-					colorBackground[]={1,0.78,0.05,0.35};
+					idc=GERAN_IDC_CURSOR_SHADOW_BOTTOM;
 				};
-				class CornerBottomLeftH: LancetGeranLine
+				class CursorLeft: LancetGeranLine
 				{
-					x="0.025 * safezoneW";
-					y="0.965 * safezoneH - 1.5 * pixelH";
-					w="0.09 * safezoneW";
-					h="1.5 * pixelH";
-					colorBackground[]={1,0.78,0.05,0.35};
+					idc=GERAN_IDC_CURSOR_LEFT;
+					colorBackground[]={1,1,1,0.96};
 				};
-				class CornerBottomLeftV: LancetGeranLine
+				class CursorRight: CursorLeft
 				{
-					x="0.025 * safezoneW";
-					y="0.875 * safezoneH";
-					w="1.5 * pixelW";
-					h="0.09 * safezoneH";
-					colorBackground[]={1,0.78,0.05,0.35};
+					idc=GERAN_IDC_CURSOR_RIGHT;
 				};
-				class CornerBottomRightH: LancetGeranLine
+				class CursorTop: CursorLeft
 				{
-					x="0.885 * safezoneW";
-					y="0.965 * safezoneH - 1.5 * pixelH";
-					w="0.09 * safezoneW";
-					h="1.5 * pixelH";
-					colorBackground[]={1,0.78,0.05,0.35};
+					idc=GERAN_IDC_CURSOR_TOP;
 				};
-				class CornerBottomRightV: LancetGeranLine
+				class CursorBottom: CursorLeft
 				{
-					x="0.975 * safezoneW - 1.5 * pixelW";
-					y="0.875 * safezoneH";
-					w="1.5 * pixelW";
-					h="0.09 * safezoneH";
-					colorBackground[]={1,0.78,0.05,0.35};
-				};
-				class CursorH: LancetGeranLine
-				{
-					idc=GERAN_IDC_CURSOR_H;
-					x="0.5 * safezoneW - 10 * pixelW";
-					y="0.5 * safezoneH - pixelH";
-					w="20 * pixelW";
-					h="2 * pixelH";
-				};
-				class CursorV: LancetGeranLine
-				{
-					idc=GERAN_IDC_CURSOR_V;
-					x="0.5 * safezoneW - pixelW";
-					y="0.5 * safezoneH - 10 * pixelH";
-					w="2 * pixelW";
-					h="20 * pixelH";
+					idc=GERAN_IDC_CURSOR_BOTTOM;
 				};
 				class SelectionTop: LancetGeranLine
 				{
@@ -1348,46 +1294,6 @@ class geran_seeker
 				class TrackLeft: TrackTop
 				{
 					idc=GERAN_IDC_TRACK_LEFT;
-				};
-				class Status: LancetGeranText
-				{
-					idc=GERAN_IDC_STATUS;
-					text="GERAN-2  SEARCH";
-					x="0.04 * safezoneW";
-					y="0.045 * safezoneH";
-					w="0.35 * safezoneW";
-					h="0.04 * safezoneH";
-				};
-				class Vision: LancetGeranText
-				{
-					idc=GERAN_IDC_VISION;
-					text="OPT  X1.0";
-					style=1;
-					x="0.61 * safezoneW";
-					y="0.045 * safezoneH";
-					w="0.35 * safezoneW";
-					h="0.04 * safezoneH";
-				};
-				class Range: LancetGeranText
-				{
-					idc=GERAN_IDC_RANGE;
-					text="RNG ----";
-					style=1;
-					x="0.61 * safezoneW";
-					y="0.91 * safezoneH";
-					w="0.35 * safezoneW";
-					h="0.04 * safezoneH";
-				};
-				class Help: LancetGeranText
-				{
-					idc=GERAN_IDC_HELP;
-					text="LMB SELECT/DRAG  RMB RELEASE  WHL ZOOM  N TI  F DET  ESC EXIT";
-					x="0.04 * safezoneW";
-					y="0.91 * safezoneH";
-					w="0.57 * safezoneW";
-					h="0.04 * safezoneH";
-					sizeEx="0.018 * safezoneH";
-					colorText[]={1,0.82,0.18,0.55};
 				};
 			};
 		};
