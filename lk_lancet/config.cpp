@@ -830,7 +830,7 @@ class CfgVehicles
 		{
 			class MainTurret: MainTurret
 			{
-				class ViewGunner: ViewGunner
+				class ViewGunner
 				{
 					initAngleX=-5;
 					initAngleY=-90;
