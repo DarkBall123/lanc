@@ -160,6 +160,7 @@ private _blur = ppEffectCreate ["DynamicBlur", 501];
 _blur ppEffectAdjust [0.08];
 _blur ppEffectCommit 0;
 _blur ppEffectEnable true;
+uiNamespace setVariable ["lancet_geran_blur", _blur];
 
 private _effects = [_grain, _blur];
 
@@ -403,6 +404,14 @@ _display displayAddEventHandler ["MouseZChanged", {
 	];
 	_camera camSetFov _fov;
 	_camera camCommit 0.15;
+
+	private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
+	if (_blur >= 0) then {
+		_blur ppEffectAdjust [
+			linearConversion [0.08, 0.75, _fov, 1.2, 0.08, true]
+		];
+		_blur ppEffectCommit 0.15;
+	};
 	true
 }];
 
@@ -528,8 +537,8 @@ while {alive _projectile && {!isNull _display}} do {
 	getMousePosition params ["_mouseX", "_mouseY"];
 	private _cursorX = _mouseX - safeZoneX;
 	private _cursorY = _mouseY - safeZoneY;
-	private _gapX = 11 * pixelW;
-	private _gapY = 11 * pixelH;
+	private _gapX = 13 * pixelW;
+	private _gapY = 13 * pixelH;
 	private _armWidth = 18 * pixelW;
 	private _armHeight = 18 * pixelH;
 	private _cursorPositions = [
@@ -582,6 +591,7 @@ if ((uiNamespace getVariable ["lancet_geran_camera", objNull]) isEqualTo _camera
 	uiNamespace setVariable ["lancet_geran_drawnCandidates", nil];
 	uiNamespace setVariable ["lancet_geran_dragStart", nil];
 	uiNamespace setVariable ["lancet_geran_dragActive", nil];
+	uiNamespace setVariable ["lancet_geran_blur", nil];
 	uiNamespace setVariable [
 		"lancet_geran_fovPulse",
 		(uiNamespace getVariable ["lancet_geran_fovPulse", 0]) + 1

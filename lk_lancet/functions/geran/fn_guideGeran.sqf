@@ -174,16 +174,42 @@ private _handle = [{
 			} else {
 				private _projectilePosASL = getPosASLVisual _projectile;
 				private _distanceToAim = _projectilePosASL vectorDistance _aimPointASL;
+				private _terminalLocked = _projectile getVariable [
+					"lancet_geran_terminalLocked",
+					false
+				];
 
 				if (
-					!(_projectile getVariable ["lancet_geran_terminalLocked", false])
+					!_terminalLocked
 					&& {_distanceToAim <= _lockRange}
 				) then {
+					_terminalLocked = true;
 					_projectile setVariable ["lancet_geran_terminalLocked", true];
 					_projectile setVariable ["lancet_geran_guidanceMode", "TERMINAL"];
 				};
 
-				_desiredDirection = vectorNormalized (_aimPointASL vectorDiff _projectilePosASL);
+				private _frameTravel = (velocity _projectile) vectorMultiply _deltaTime;
+				private _frameTravelSquared = _frameTravel vectorDotProduct _frameTravel;
+				private _closestDistance = _distanceToAim;
+
+				if (_frameTravelSquared > 0) then {
+					private _toAim = _aimPointASL vectorDiff _projectilePosASL;
+					private _travelFraction = (
+						(_toAim vectorDotProduct _frameTravel) / _frameTravelSquared
+					) max 0 min 1;
+					private _closestPosition = _projectilePosASL vectorAdd (
+						_frameTravel vectorMultiply _travelFraction
+					);
+					_closestDistance = _closestPosition vectorDistance _aimPointASL;
+				};
+
+				if (_terminalLocked && {_closestDistance <= 12}) then {
+					triggerAmmo _projectile;
+				} else {
+					_desiredDirection = vectorNormalized (
+						_aimPointASL vectorDiff _projectilePosASL
+					);
+				};
 			};
 		};
 

@@ -34,7 +34,7 @@ private _traceScreen = {
 		_visualUav,
 		true,
 		1,
-		"VIEW",
+		"FIRE",
 		"GEOM"
 	];
 
@@ -87,13 +87,6 @@ private _bestScore = -10000000000;
 if (!isNull _targetObject) then {
 	private _bounds = boundingBoxReal _targetObject;
 	_targetOffsetModel = ((_bounds # 0) vectorAdd (_bounds # 1)) vectorMultiply 0.5;
-
-	if (!_isDrag) then {
-		private _hit = [_end] call _traceScreen;
-		if ((_hit # 0) isEqualTo _targetObject) then {
-			_targetOffsetModel = _targetObject worldToModel (ASLToAGL (_hit # 1));
-		};
-	};
 
 	_targetPointASL = AGLToASL (_targetObject modelToWorldVisual _targetOffsetModel);
 } else {
@@ -168,10 +161,19 @@ private _camera = uiNamespace getVariable ["lancet_geran_camera", objNull];
 if (!isNull _camera && {!_wasDiving}) then {
 	private _userFov = uiNamespace getVariable ["lancet_geran_userFov", 0.75];
 	private _pulse = (uiNamespace getVariable ["lancet_geran_fovPulse", 0]) + 1;
+	private _pulseFov = (_userFov * 1.12) min 0.9;
 
 	uiNamespace setVariable ["lancet_geran_fovPulse", _pulse];
-	_camera camSetFov ((_userFov * 1.12) min 0.9);
+	_camera camSetFov _pulseFov;
 	_camera camCommit 0.2;
+
+	private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
+	if (_blur >= 0) then {
+		_blur ppEffectAdjust [
+			linearConversion [0.08, 0.75, _pulseFov, 1.2, 0.08, true]
+		];
+		_blur ppEffectCommit 0.2;
+	};
 
 	[_camera, _pulse] spawn {
 		params ["_camera", "_pulse"];
@@ -181,8 +183,17 @@ if (!isNull _camera && {!_wasDiving}) then {
 			!isNull _camera
 			&& {_pulse isEqualTo (uiNamespace getVariable ["lancet_geran_fovPulse", -1])}
 		) then {
-			_camera camSetFov (uiNamespace getVariable ["lancet_geran_userFov", 0.75]);
+			private _userFov = uiNamespace getVariable ["lancet_geran_userFov", 0.75];
+			_camera camSetFov _userFov;
 			_camera camCommit 0.45;
+
+			private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
+			if (_blur >= 0) then {
+				_blur ppEffectAdjust [
+					linearConversion [0.08, 0.75, _userFov, 1.2, 0.08, true]
+				];
+				_blur ppEffectCommit 0.45;
+			};
 		};
 	};
 };
