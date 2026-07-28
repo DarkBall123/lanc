@@ -826,6 +826,30 @@ class CfgVehicles
 		_generalmacro="geran_tripod_launcher";
 		displayName="Geran-2 Tripod Launcher";
 		editorPreview="\lk_lancet\textures\preview_shahed.jpg";
+		class Turrets: Turrets
+		{
+			class MainTurret: MainTurret
+			{
+				class ViewGunner: ViewGunner
+				{
+					initAngleX=-5;
+					initAngleY=-90;
+					initFov=1;
+					minFov=1;
+					maxFov=1;
+					minAngleX=-65;
+					maxAngleX=65;
+					minAngleY=-225;
+					maxAngleY=45;
+					minMoveX=-0.075000003;
+					maxMoveX=0.075000003;
+					minMoveY=-0.075000003;
+					maxMoveY=0.075000003;
+					minMoveZ=-0.075000003;
+					maxMoveZ=0.1;
+				};
+			};
+		};
 		class assembleInfo
 		{
 			primary=0;
