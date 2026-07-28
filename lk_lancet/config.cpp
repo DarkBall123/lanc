@@ -1,5 +1,6 @@
 #define GRID_W( num ) ( num * ( pixelGridNoUIScale * pixelW * 2 ))
 #define GRID_H( num ) ( num * ( pixelGridNoUIScale * pixelH * 2 ))
+#include "geran_ui.hpp"
 
 class CfgPatches
 {
@@ -229,6 +230,9 @@ class cfgammo
 			distance=1;
 		};
 		lancet_speedArray[]={150,90,10,1000,1};
+		geranDetectionRange=1250;
+		geranTerminalLockRange=200;
+		geranGuidanceTurnRate=30;
 	};
 };
 class cfgMagazines
@@ -1019,6 +1023,25 @@ class CfgFunctions
 			{
 			};
 		};
+		class geran
+		{
+			file="lk_lancet\functions\geran";
+			class getGeranConfidence
+			{
+			};
+			class findGeranTargets
+			{
+			};
+			class selectGeranTarget
+			{
+			};
+			class guideGeran
+			{
+			};
+			class handleGeranMissile
+			{
+			};
+		};
 	};
 };
 class cfgMods
@@ -1040,6 +1063,7 @@ class RscPicture;
 class RscText;
 class ctrlMapEmpty;
 class ctrlStaticBackground;
+class RscControlsGroupNoScrollbars;
 
 class lancet_seeker
 {
@@ -1157,6 +1181,121 @@ class lancet_seeker
 			style="ST_LEFT";
 			font="LCD14";
 			fade=1;
+		};
+	};
+	class controlsBackground
+	{
+		class map_background: ctrlMapEmpty
+		{
+			idc=-1;
+			x=0;
+			y=0;
+			w=1;
+			h=1;
+			onLoad="(_this # 0) ctrlMapCursor ['', 'BlankCursor']; (_this # 0) ctrlShow false;";
+		};
+	};
+};
+class LancetGeranLine: RscText
+{
+	text="";
+	x=0;
+	y=0;
+	w=0;
+	h=0;
+	colorText[]={1,0.78,0.05,0.9};
+	colorBackground[]={1,0.78,0.05,0.9};
+	shadow=0;
+};
+class geran_seeker
+{
+	idd=GERAN_IDD_SEEKER;
+	movingEnable=0;
+	enableSimulation=1;
+	class controls
+	{
+		class HudGroup: RscControlsGroupNoScrollbars
+		{
+			idc=GERAN_IDC_HUD_GROUP;
+			x="safeZoneX";
+			y="safeZoneY";
+			w="safeZoneW";
+			h="safeZoneH";
+			class Controls
+			{
+				class CursorShadowLeft: LancetGeranLine
+				{
+					idc=GERAN_IDC_CURSOR_SHADOW_LEFT;
+					colorBackground[]={0.01,0.015,0.02,0.78};
+				};
+				class CursorShadowRight: CursorShadowLeft
+				{
+					idc=GERAN_IDC_CURSOR_SHADOW_RIGHT;
+				};
+				class CursorShadowTop: CursorShadowLeft
+				{
+					idc=GERAN_IDC_CURSOR_SHADOW_TOP;
+				};
+				class CursorShadowBottom: CursorShadowLeft
+				{
+					idc=GERAN_IDC_CURSOR_SHADOW_BOTTOM;
+				};
+				class CursorLeft: LancetGeranLine
+				{
+					idc=GERAN_IDC_CURSOR_LEFT;
+					colorBackground[]={1,1,1,0.96};
+				};
+				class CursorRight: CursorLeft
+				{
+					idc=GERAN_IDC_CURSOR_RIGHT;
+				};
+				class CursorTop: CursorLeft
+				{
+					idc=GERAN_IDC_CURSOR_TOP;
+				};
+				class CursorBottom: CursorLeft
+				{
+					idc=GERAN_IDC_CURSOR_BOTTOM;
+				};
+				class SelectionTop: LancetGeranLine
+				{
+					idc=GERAN_IDC_SELECTION_TOP;
+					show=0;
+				};
+				class SelectionRight: LancetGeranLine
+				{
+					idc=GERAN_IDC_SELECTION_RIGHT;
+					show=0;
+				};
+				class SelectionBottom: LancetGeranLine
+				{
+					idc=GERAN_IDC_SELECTION_BOTTOM;
+					show=0;
+				};
+				class SelectionLeft: LancetGeranLine
+				{
+					idc=GERAN_IDC_SELECTION_LEFT;
+					show=0;
+				};
+				class TrackTop: LancetGeranLine
+				{
+					idc=GERAN_IDC_TRACK_TOP;
+					show=0;
+					colorBackground[]={0.25,1,0.25,0.95};
+				};
+				class TrackRight: TrackTop
+				{
+					idc=GERAN_IDC_TRACK_RIGHT;
+				};
+				class TrackBottom: TrackTop
+				{
+					idc=GERAN_IDC_TRACK_BOTTOM;
+				};
+				class TrackLeft: TrackTop
+				{
+					idc=GERAN_IDC_TRACK_LEFT;
+				};
+			};
 		};
 	};
 	class controlsBackground
