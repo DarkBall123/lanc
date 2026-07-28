@@ -2,7 +2,8 @@
 
 disableSerialization;
 
-params ["_projectile", ["_offset", 2], ["_speedArray", []], ["_dialogName", "geran_seeker"]];
+private _projectile = param [0, objNull];
+private _dialogName = param [3, "geran_seeker"];
 
 if (isNull _projectile || {!alive _projectile}) exitWith {};
 if (!isNull (findDisplay GERAN_IDD_SEEKER)) exitWith {};
