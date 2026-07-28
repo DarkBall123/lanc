@@ -1,5 +1,6 @@
 #define GRID_W( num ) ( num * ( pixelGridNoUIScale * pixelW * 2 ))
 #define GRID_H( num ) ( num * ( pixelGridNoUIScale * pixelH * 2 ))
+#include "geran_ui.hpp"
 
 class CfgPatches
 {
@@ -229,6 +230,9 @@ class cfgammo
 			distance=1;
 		};
 		lancet_speedArray[]={150,90,10,1000,1};
+		geranDetectionRange=1250;
+		geranTerminalLockRange=200;
+		geranGuidanceTurnRate=30;
 	};
 };
 class cfgMagazines
@@ -1019,6 +1023,25 @@ class CfgFunctions
 			{
 			};
 		};
+		class geran
+		{
+			file="lk_lancet\functions\geran";
+			class getGeranConfidence
+			{
+			};
+			class findGeranTargets
+			{
+			};
+			class selectGeranTarget
+			{
+			};
+			class guideGeran
+			{
+			};
+			class handleGeranMissile
+			{
+			};
+		};
 	};
 };
 class cfgMods
@@ -1040,6 +1063,7 @@ class RscPicture;
 class RscText;
 class ctrlMapEmpty;
 class ctrlStaticBackground;
+class RscControlsGroupNoScrollbars;
 
 class lancet_seeker
 {
@@ -1157,6 +1181,215 @@ class lancet_seeker
 			style="ST_LEFT";
 			font="LCD14";
 			fade=1;
+		};
+	};
+	class controlsBackground
+	{
+		class map_background: ctrlMapEmpty
+		{
+			idc=-1;
+			x=0;
+			y=0;
+			w=1;
+			h=1;
+			onLoad="(_this # 0) ctrlMapCursor ['', 'BlankCursor']; (_this # 0) ctrlShow false;";
+		};
+	};
+};
+class LancetGeranLine: RscText
+{
+	text="";
+	x=0;
+	y=0;
+	w=0;
+	h=0;
+	colorText[]={1,0.78,0.05,0.9};
+	colorBackground[]={1,0.78,0.05,0.9};
+	shadow=0;
+};
+class LancetGeranText: RscText
+{
+	font="EtelkaMonospacePro";
+	sizeEx="0.026 * safezoneH";
+	colorText[]={1,0.82,0.18,0.9};
+	colorBackground[]={0,0,0,0};
+	shadow=0;
+};
+class geran_seeker
+{
+	idd=GERAN_IDD_SEEKER;
+	movingEnable=0;
+	enableSimulation=1;
+	class controls
+	{
+		class HudGroup: RscControlsGroupNoScrollbars
+		{
+			idc=GERAN_IDC_HUD_GROUP;
+			x="safeZoneX";
+			y="safeZoneY";
+			w="safeZoneW";
+			h="safeZoneH";
+			class Controls
+			{
+				class CornerTopLeftH: LancetGeranLine
+				{
+					x="0.025 * safezoneW";
+					y="0.035 * safezoneH";
+					w="0.09 * safezoneW";
+					h="1.5 * pixelH";
+					colorBackground[]={1,0.78,0.05,0.35};
+				};
+				class CornerTopLeftV: LancetGeranLine
+				{
+					x="0.025 * safezoneW";
+					y="0.035 * safezoneH";
+					w="1.5 * pixelW";
+					h="0.09 * safezoneH";
+					colorBackground[]={1,0.78,0.05,0.35};
+				};
+				class CornerTopRightH: LancetGeranLine
+				{
+					x="0.885 * safezoneW";
+					y="0.035 * safezoneH";
+					w="0.09 * safezoneW";
+					h="1.5 * pixelH";
+					colorBackground[]={1,0.78,0.05,0.35};
+				};
+				class CornerTopRightV: LancetGeranLine
+				{
+					x="0.975 * safezoneW - 1.5 * pixelW";
+					y="0.035 * safezoneH";
+					w="1.5 * pixelW";
+					h="0.09 * safezoneH";
+					colorBackground[]={1,0.78,0.05,0.35};
+				};
+				class CornerBottomLeftH: LancetGeranLine
+				{
+					x="0.025 * safezoneW";
+					y="0.965 * safezoneH - 1.5 * pixelH";
+					w="0.09 * safezoneW";
+					h="1.5 * pixelH";
+					colorBackground[]={1,0.78,0.05,0.35};
+				};
+				class CornerBottomLeftV: LancetGeranLine
+				{
+					x="0.025 * safezoneW";
+					y="0.875 * safezoneH";
+					w="1.5 * pixelW";
+					h="0.09 * safezoneH";
+					colorBackground[]={1,0.78,0.05,0.35};
+				};
+				class CornerBottomRightH: LancetGeranLine
+				{
+					x="0.885 * safezoneW";
+					y="0.965 * safezoneH - 1.5 * pixelH";
+					w="0.09 * safezoneW";
+					h="1.5 * pixelH";
+					colorBackground[]={1,0.78,0.05,0.35};
+				};
+				class CornerBottomRightV: LancetGeranLine
+				{
+					x="0.975 * safezoneW - 1.5 * pixelW";
+					y="0.875 * safezoneH";
+					w="1.5 * pixelW";
+					h="0.09 * safezoneH";
+					colorBackground[]={1,0.78,0.05,0.35};
+				};
+				class CursorH: LancetGeranLine
+				{
+					idc=GERAN_IDC_CURSOR_H;
+					x="0.5 * safezoneW - 10 * pixelW";
+					y="0.5 * safezoneH - pixelH";
+					w="20 * pixelW";
+					h="2 * pixelH";
+				};
+				class CursorV: LancetGeranLine
+				{
+					idc=GERAN_IDC_CURSOR_V;
+					x="0.5 * safezoneW - pixelW";
+					y="0.5 * safezoneH - 10 * pixelH";
+					w="2 * pixelW";
+					h="20 * pixelH";
+				};
+				class SelectionTop: LancetGeranLine
+				{
+					idc=GERAN_IDC_SELECTION_TOP;
+					show=0;
+				};
+				class SelectionRight: LancetGeranLine
+				{
+					idc=GERAN_IDC_SELECTION_RIGHT;
+					show=0;
+				};
+				class SelectionBottom: LancetGeranLine
+				{
+					idc=GERAN_IDC_SELECTION_BOTTOM;
+					show=0;
+				};
+				class SelectionLeft: LancetGeranLine
+				{
+					idc=GERAN_IDC_SELECTION_LEFT;
+					show=0;
+				};
+				class TrackTop: LancetGeranLine
+				{
+					idc=GERAN_IDC_TRACK_TOP;
+					show=0;
+					colorBackground[]={0.25,1,0.25,0.95};
+				};
+				class TrackRight: TrackTop
+				{
+					idc=GERAN_IDC_TRACK_RIGHT;
+				};
+				class TrackBottom: TrackTop
+				{
+					idc=GERAN_IDC_TRACK_BOTTOM;
+				};
+				class TrackLeft: TrackTop
+				{
+					idc=GERAN_IDC_TRACK_LEFT;
+				};
+				class Status: LancetGeranText
+				{
+					idc=GERAN_IDC_STATUS;
+					text="GERAN-2  SEARCH";
+					x="0.04 * safezoneW";
+					y="0.045 * safezoneH";
+					w="0.35 * safezoneW";
+					h="0.04 * safezoneH";
+				};
+				class Vision: LancetGeranText
+				{
+					idc=GERAN_IDC_VISION;
+					text="OPT  X1.0";
+					style=1;
+					x="0.61 * safezoneW";
+					y="0.045 * safezoneH";
+					w="0.35 * safezoneW";
+					h="0.04 * safezoneH";
+				};
+				class Range: LancetGeranText
+				{
+					idc=GERAN_IDC_RANGE;
+					text="RNG ----";
+					style=1;
+					x="0.61 * safezoneW";
+					y="0.91 * safezoneH";
+					w="0.35 * safezoneW";
+					h="0.04 * safezoneH";
+				};
+				class Help: LancetGeranText
+				{
+					idc=GERAN_IDC_HELP;
+					text="LMB SELECT/DRAG  RMB RELEASE  WHL ZOOM  N TI  F DET  ESC EXIT";
+					x="0.04 * safezoneW";
+					y="0.91 * safezoneH";
+					w="0.57 * safezoneW";
+					h="0.04 * safezoneH";
+					sizeEx="0.018 * safezoneH";
+					colorText[]={1,0.82,0.18,0.55};
+				};
+			};
 		};
 	};
 	class controlsBackground

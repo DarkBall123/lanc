@@ -104,7 +104,8 @@ _uav setVelocity [
 _uav setDamage 0;
 
 private _controlUnits = if (_isGeran) then {[_gunner]} else {[]};
-[_unit, _uav, [], 0.65, "lancet_seeker", _controlUnits] call lancet_fnc_initMissile;
+private _interface = if (_isGeran) then {"geran_seeker"} else {"lancet_seeker"};
+[_unit, _uav, [], 0.65, _interface, _controlUnits] call lancet_fnc_initMissile;
 
 [_uav, _verticalAngle, _launchSpeed] spawn {
     params ["_uav", "_verticalAngle", "_launchSpeed"];

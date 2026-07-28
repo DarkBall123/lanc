@@ -25,7 +25,11 @@ _projectile setVariable ["lancet_launchTime", time];
 		private _offset 	= _arguments # 2;
 		private _interface 	= _arguments # 3;
 
-		[_projectile, _offset, [], _interface] spawn lancet_fnc_handleMissile;
+		if (_interface isEqualTo "geran_seeker") then {
+			[_projectile, _offset, [], _interface] spawn lancet_fnc_handleGeranMissile;
+		} else {
+			[_projectile, _offset, [], _interface] spawn lancet_fnc_handleMissile;
+		};
 	}, [_x, _projectile, _offset, _interface], 10, true, false, "","", 5, false];
 
 	//Clean the action if the proj dies
@@ -56,9 +60,14 @@ if(isTouchingGround _unit) then {
 		private _targetAlt = _altUnit + 350;
 
 		waitUntil {
-			(((getPosASL _projectile) # 2) > _targetAlt) or (!alive _projectile)
+			(((getPosASL _projectile) # 2) > _targetAlt)
+				or (!alive _projectile)
+				or ((_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isNotEqualTo "CRUISE")
 		};
-		if(!alive _projectile) exitWith {};
+		if (
+			!alive _projectile
+				or ((_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isNotEqualTo "CRUISE")
+		) exitWith {};
 
 		private _vDirTgt = vectorDir _projectile;
 		_vDirTgt set [2,0];
@@ -70,9 +79,11 @@ if(isTouchingGround _unit) then {
 		//Handle moving the missile
 		_id = ["lancet_handleMissileLevel", "onEachFrame", {
 			params[ "_projectile","_timeArr", "_vUpArr", "_vDirArr"];
-			_vDir = vectorLinearConversion [_timeArr # 0, _timeArr # 1, time, _vDirArr # 0, _vDirArr # 1];
-			_vUp  = vectorLinearConversion [_timeArr # 0, _timeArr # 1, time, _vUpArr # 0, _vUpArr # 1];
-			_projectile setVectorDirAndUp [_vDir, _vUp];
+			if ((_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "CRUISE") then {
+				_vDir = vectorLinearConversion [_timeArr # 0, _timeArr # 1, time, _vDirArr # 0, _vDirArr # 1];
+				_vUp  = vectorLinearConversion [_timeArr # 0, _timeArr # 1, time, _vUpArr # 0, _vUpArr # 1];
+				_projectile setVectorDirAndUp [_vDir, _vUp];
+			};
 		}, [_projectile, [time, time + 1.5], [_vUpProj, [0,0,1]], [_vDirProj, _vDirTgt]]] call BIS_fnc_addStackedEventHandler;
 
 		private _timeZero = time;
