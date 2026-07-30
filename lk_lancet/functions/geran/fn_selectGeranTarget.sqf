@@ -167,6 +167,14 @@ if (!isNull _camera && {!_wasDiving}) then {
 	_camera camSetFov _pulseFov;
 	_camera camCommit 0.2;
 
+	private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
+	if (_blur >= 0) then {
+		private _blurFactor = linearConversion [0.08, 0.55, _pulseFov, 1, 0, true];
+		_blurFactor = _blurFactor * _blurFactor * (3 - (2 * _blurFactor));
+		_blur ppEffectAdjust [0.24 * _blurFactor];
+		_blur ppEffectCommit 0.25;
+	};
+
 	[_camera, _pulse] spawn {
 		params ["_camera", "_pulse"];
 		uiSleep 0.2;
@@ -178,6 +186,14 @@ if (!isNull _camera && {!_wasDiving}) then {
 			private _userFov = uiNamespace getVariable ["lancet_geran_userFov", 0.75];
 			_camera camSetFov _userFov;
 			_camera camCommit 0.45;
+
+			private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
+			if (_blur >= 0) then {
+				private _blurFactor = linearConversion [0.08, 0.55, _userFov, 1, 0, true];
+				_blurFactor = _blurFactor * _blurFactor * (3 - (2 * _blurFactor));
+				_blur ppEffectAdjust [0.24 * _blurFactor];
+				_blur ppEffectCommit 0.45;
+			};
 		};
 	};
 };
