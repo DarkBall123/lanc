@@ -53,6 +53,15 @@ class CfgPatches
 class cfgammo
 {
 	class M_Jian_AT;
+	class ammo_Penetrator_Base;
+	class m_geran_penetrator: ammo_Penetrator_Base
+	{
+		hit=460;
+		indirectHit=0;
+		indirectHitRange=0;
+		caliber=30;
+		warheadName="HEAT";
+	};
 	class m_lancet_dummy: M_Jian_AT
 	{
 		modelspecial="\lk_lancet\lancet_3.p3d";
@@ -123,6 +132,7 @@ class cfgammo
 	{
 		modelspecial="\lk_lancet\shahed4.p3d";
 		model="\lk_lancet\shahed4.p3d";
+		submunitionAmmo="m_geran_penetrator";
 		soundFly[]=
 		{
 			"A3\Sounds_F_Jets\vehicles\air\UAV_05\B_UAV_05_engine_low_ext",
