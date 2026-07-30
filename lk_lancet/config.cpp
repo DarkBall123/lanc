@@ -1081,6 +1081,7 @@ class RscText;
 class ctrlMapEmpty;
 class ctrlStaticBackground;
 class RscControlsGroupNoScrollbars;
+class RscMapControl;
 
 class lancet_seeker
 {
@@ -1231,6 +1232,15 @@ class geran_seeker
 	enableSimulation=1;
 	class controls
 	{
+		class FlightMap: RscMapControl
+		{
+			idc=GERAN_IDC_MAP;
+			x="safeZoneX";
+			y="safeZoneY";
+			w="safeZoneW";
+			h="safeZoneH";
+			show=0;
+		};
 		class HudGroup: RscControlsGroupNoScrollbars
 		{
 			idc=GERAN_IDC_HUD_GROUP;

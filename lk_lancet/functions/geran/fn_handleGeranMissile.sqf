@@ -22,6 +22,7 @@ uiNamespace setVariable ["lancet_geran_userFov", 0.75];
 uiNamespace setVariable ["lancet_geran_dragStart", []];
 uiNamespace setVariable ["lancet_geran_dragActive", false];
 uiNamespace setVariable ["lancet_geran_drawnCandidates", []];
+uiNamespace setVariable ["lancet_geran_mapOpen", false];
 
 if ((_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL") then {
 	_projectile setVariable ["lancet_geran_manualInput", [0, 0]];
@@ -175,6 +176,35 @@ if ((_projectile getVariable ["lancet_geran_explodeEH", -1]) < 0) then {
 _display displayAddEventHandler ["KeyDown", {
 	params ["_display", "_key"];
 
+	private _setMapOpen = {
+		params ["_display", "_open"];
+
+		private _map = _display displayCtrl GERAN_IDC_MAP;
+		private _hud = _display displayCtrl GERAN_IDC_HUD_GROUP;
+		private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+
+		uiNamespace setVariable ["lancet_geran_mapOpen", _open];
+		_map ctrlShow _open;
+		_hud ctrlShow !_open;
+
+		if (_open) then {
+			if (!isNull _projectile) then {
+				_projectile setVariable ["lancet_geran_manualInput", [0, 0]];
+				_projectile setVariable ["lancet_geran_manualInputSmoothed", [0, 0]];
+				_map ctrlMapAnimAdd [0, 0.08, _projectile];
+				ctrlMapAnimCommit _map;
+			};
+			ctrlSetFocus _map;
+		} else {
+			if (
+				!isNull _projectile
+				&& {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
+			) then {
+				setMousePosition [0.5, 0.5];
+			};
+		};
+	};
+
 	switch (_key) do {
 		case 49: {
 			private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
@@ -233,8 +263,17 @@ _display displayAddEventHandler ["KeyDown", {
 			_display closeDisplay 1;
 			true
 		};
+		case 50: {
+			private _open = !(uiNamespace getVariable ["lancet_geran_mapOpen", false]);
+			[_display, _open] call _setMapOpen;
+			true
+		};
 		case 1: {
-			_display closeDisplay 1;
+			if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) then {
+				[_display, false] call _setMapOpen;
+			} else {
+				_display closeDisplay 1;
+			};
 			true
 		};
 		default {
@@ -245,6 +284,8 @@ _display displayAddEventHandler ["KeyDown", {
 
 _display displayAddEventHandler ["MouseButtonDown", {
 	params ["_display", "_button"];
+	if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) exitWith {false};
+
 	private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
 	private _mode = if (isNull _projectile) then {
 		"CRUISE"
@@ -290,6 +331,8 @@ _display displayAddEventHandler ["MouseButtonDown", {
 
 _display displayAddEventHandler ["MouseMoving", {
 	params ["_display"];
+	if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) exitWith {false};
+
 	private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
 
 	if (
@@ -351,6 +394,7 @@ _display displayAddEventHandler ["MouseMoving", {
 
 _display displayAddEventHandler ["MouseButtonUp", {
 	params ["_display", "_button"];
+	if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) exitWith {false};
 	if (_button isNotEqualTo 0) exitWith {false};
 
 	private _start = uiNamespace getVariable ["lancet_geran_dragStart", []];
@@ -390,6 +434,8 @@ _display displayAddEventHandler ["MouseButtonUp", {
 
 _display displayAddEventHandler ["MouseZChanged", {
 	params ["_display", "_scroll"];
+	if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) exitWith {false};
+
 	private _camera = uiNamespace getVariable ["lancet_geran_camera", objNull];
 	if (isNull _camera || {_scroll isEqualTo 0}) exitWith {false};
 
@@ -592,6 +638,7 @@ if ((uiNamespace getVariable ["lancet_geran_camera", objNull]) isEqualTo _camera
 	uiNamespace setVariable ["lancet_geran_dragStart", nil];
 	uiNamespace setVariable ["lancet_geran_dragActive", nil];
 	uiNamespace setVariable ["lancet_geran_blur", nil];
+	uiNamespace setVariable ["lancet_geran_mapOpen", nil];
 	uiNamespace setVariable [
 		"lancet_geran_fovPulse",
 		(uiNamespace getVariable ["lancet_geran_fovPulse", 0]) + 1
