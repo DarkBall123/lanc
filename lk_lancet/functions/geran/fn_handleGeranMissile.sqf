@@ -35,6 +35,27 @@ private _thermal = _projectile getVariable ["lancet_geran_thermal", false];
 _thermal setCamUseTI 0;
 
 private _hudGroup = _display displayCtrl GERAN_IDC_HUD_GROUP;
+private _attackAngleControl = _display displayCtrl GERAN_IDC_ATTACK_ANGLE;
+private _flightMap = _display displayCtrl GERAN_IDC_MAP;
+_flightMap ctrlMapCursor ["", "BlankCursor"];
+_flightMap ctrlAddEventHandler ["Draw", {
+	params ["_map"];
+
+	private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+	if (!isNull _projectile && {alive _projectile}) then {
+		_map drawIcon [
+			"iconPlane",
+			[0.15, 1, 0.25, 1],
+			getPosASLVisual _projectile,
+			30,
+			30,
+			getDirVisual _projectile,
+			"",
+			1
+		];
+	};
+}];
+
 private _cursorControls = [
 	_display displayCtrl GERAN_IDC_CURSOR_SHADOW_LEFT,
 	_display displayCtrl GERAN_IDC_CURSOR_SHADOW_RIGHT,
@@ -168,7 +189,7 @@ _grain ppEffectAdjust [0.18, 1, 1, 0.45, 0.45, true];
 _grain ppEffectCommit 0;
 _grain ppEffectEnable true;
 
-private _blur = ["DynamicBlur", 2002] call _createGeranPPEffect;
+private _blur = ["DynamicBlur", 500] call _createGeranPPEffect;
 _blur ppEffectAdjust [0];
 _blur ppEffectCommit 0;
 _blur ppEffectEnable true;
@@ -191,14 +212,17 @@ _display displayAddEventHandler ["KeyDown", {
 		params ["_display", "_open"];
 
 		private _map = _display displayCtrl GERAN_IDC_MAP;
+		private _mapFrame = _display displayCtrl GERAN_IDC_MAP_FRAME;
 		private _hud = _display displayCtrl GERAN_IDC_HUD_GROUP;
 		private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
 
 		uiNamespace setVariable ["lancet_geran_mapOpen", _open];
 		_map ctrlShow _open;
+		_mapFrame ctrlShow _open;
 		_hud ctrlShow !_open;
 
 		if (_open) then {
+			_map ctrlMapCursor ["", "Arrow"];
 			if (!isNull _projectile) then {
 				_projectile setVariable ["lancet_geran_manualInput", [0, 0]];
 				_projectile setVariable ["lancet_geran_manualInputSmoothed", [0, 0]];
@@ -207,6 +231,7 @@ _display displayAddEventHandler ["KeyDown", {
 			};
 			ctrlSetFocus _map;
 		} else {
+			_map ctrlMapCursor ["", "BlankCursor"];
 			if (
 				!isNull _projectile
 				&& {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
@@ -466,7 +491,7 @@ _display displayAddEventHandler ["MouseZChanged", {
 	if (_blur >= 0) then {
 		private _blurFactor = linearConversion [0.08, 0.55, _fov, 1, 0, true];
 		_blurFactor = _blurFactor * _blurFactor * (3 - (2 * _blurFactor));
-		_blur ppEffectAdjust [0.24 * _blurFactor];
+		_blur ppEffectAdjust [0.16 * _blurFactor];
 		_blur ppEffectCommit 0.25;
 	};
 	true
@@ -591,13 +616,23 @@ while {alive _projectile && {!isNull _display}} do {
 		} forEach _trackLines;
 	};
 
+	private _flightVector = velocity _projectile;
+	if (vectorMagnitude _flightVector < 1) then {
+		_flightVector = vectorDir _projectile;
+	};
+	_flightVector = vectorNormalized _flightVector;
+	private _attackAngle = acos (
+		(((vectorDir _projectile) vectorCos _flightVector) max -1) min 1
+	);
+	_attackAngleControl ctrlSetText format ["%1°", _attackAngle toFixed 2];
+
 	getMousePosition params ["_mouseX", "_mouseY"];
 	private _cursorX = _mouseX - safeZoneX;
 	private _cursorY = _mouseY - safeZoneY;
 	private _gapX = 13 * pixelW;
 	private _gapY = 13 * pixelH;
-	private _armWidth = 18 * pixelW;
-	private _armHeight = 18 * pixelH;
+	private _armWidth = 28 * pixelW;
+	private _armHeight = 28 * pixelH;
 	private _cursorPositions = [
 		[_cursorX - _gapX - _armWidth, _cursorY - (2 * pixelH), _armWidth, 4 * pixelH],
 		[_cursorX + _gapX, _cursorY - (2 * pixelH), _armWidth, 4 * pixelH],

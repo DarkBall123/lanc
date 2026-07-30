@@ -153,6 +153,7 @@ _projectile setVariable ["lancet_geran_targetVisible", !isNull _targetObject];
 _projectile setVariable ["lancet_geran_terminalLocked", false];
 _projectile setVariable ["lancet_geran_terminalMinDistance", -1];
 _projectile setVariable ["lancet_geran_terminalMissDetonateAt", -1];
+_projectile setVariable ["lancet_geran_terminalWasApproaching", false];
 _projectile setVariable ["lancet_geran_guidanceMode", "DIVE"];
 _projectile setVariable ["lancet_geran_nextTrackCheck", 0];
 _projectile setVariable ["lancet_geran_turnSpeed", 0];
@@ -173,7 +174,7 @@ if (!isNull _camera && {!_wasDiving}) then {
 	if (_blur >= 0) then {
 		private _blurFactor = linearConversion [0.08, 0.55, _pulseFov, 1, 0, true];
 		_blurFactor = _blurFactor * _blurFactor * (3 - (2 * _blurFactor));
-		_blur ppEffectAdjust [0.24 * _blurFactor];
+		_blur ppEffectAdjust [0.16 * _blurFactor];
 		_blur ppEffectCommit 0.25;
 	};
 
@@ -193,7 +194,7 @@ if (!isNull _camera && {!_wasDiving}) then {
 			if (_blur >= 0) then {
 				private _blurFactor = linearConversion [0.08, 0.55, _userFov, 1, 0, true];
 				_blurFactor = _blurFactor * _blurFactor * (3 - (2 * _blurFactor));
-				_blur ppEffectAdjust [0.24 * _blurFactor];
+				_blur ppEffectAdjust [0.16 * _blurFactor];
 				_blur ppEffectCommit 0.45;
 			};
 		};

@@ -1232,13 +1232,23 @@ class geran_seeker
 	enableSimulation=1;
 	class controls
 	{
+		class FlightMapFrame: RscText
+		{
+			idc=GERAN_IDC_MAP_FRAME;
+			x="safeZoneX + 0.135 * safeZoneW";
+			y="safeZoneY + 0.13 * safeZoneH";
+			w="0.73 * safeZoneW";
+			h="0.74 * safeZoneH";
+			colorBackground[]={0.015,0.025,0.02,0.96};
+			show=0;
+		};
 		class FlightMap: RscMapControl
 		{
 			idc=GERAN_IDC_MAP;
-			x="safeZoneX";
-			y="safeZoneY";
-			w="safeZoneW";
-			h="safeZoneH";
+			x="safeZoneX + 0.14 * safeZoneW";
+			y="safeZoneY + 0.14 * safeZoneH";
+			w="0.72 * safeZoneW";
+			h="0.72 * safeZoneH";
 			show=0;
 		};
 		class HudGroup: RscControlsGroupNoScrollbars
@@ -1250,6 +1260,21 @@ class geran_seeker
 			h="safeZoneH";
 			class Controls
 			{
+				class AttackAngle: RscText
+				{
+					idc=GERAN_IDC_ATTACK_ANGLE;
+					text="";
+					x="0.43 * safeZoneW";
+					y="0.035 * safeZoneH";
+					w="0.14 * safeZoneW";
+					h="0.045 * safeZoneH";
+					style=2;
+					font="RobotoCondensed";
+					sizeEx="0.027 * safeZoneH";
+					colorText[]={0.2,1,0.25,0.96};
+					colorBackground[]={0,0,0,0};
+					shadow=1;
+				};
 				class CursorShadowLeft: LancetGeranLine
 				{
 					idc=GERAN_IDC_CURSOR_SHADOW_LEFT;

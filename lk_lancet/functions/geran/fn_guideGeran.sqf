@@ -188,6 +188,7 @@ private _handle = [{
 					_projectile setVariable ["lancet_geran_guidanceMode", "TERMINAL"];
 					_projectile setVariable ["lancet_geran_terminalMinDistance", _distanceToAim];
 					_projectile setVariable ["lancet_geran_terminalMissDetonateAt", -1];
+					_projectile setVariable ["lancet_geran_terminalWasApproaching", false];
 				};
 
 				private _missDetonateAt = _projectile getVariable [
@@ -230,14 +231,31 @@ private _handle = [{
 							"lancet_geran_terminalMinDistance",
 							_minimumDistance
 						];
-						_passedAim = (_velocity vectorDotProduct _toAim) <= 0;
+
+						private _approachRate = _velocity vectorDotProduct _toAim;
+						private _wasApproaching = _projectile getVariable [
+							"lancet_geran_terminalWasApproaching",
+							false
+						];
+
+						if (_approachRate > 0) then {
+							_wasApproaching = true;
+							_projectile setVariable [
+								"lancet_geran_terminalWasApproaching",
+								true
+							];
+						};
+
+						_passedAim = _wasApproaching
+							&& {_approachRate <= 0}
+							&& {_distanceToAim >= (_minimumDistance + 3)};
 					};
 
 					if (_terminalLocked && {_closestDistance <= 12}) then {
 						triggerAmmo _projectile;
 					} else {
 						if (_terminalLocked && {_passedAim}) then {
-							if (_minimumDistance <= 30) then {
+							if (_minimumDistance <= 12) then {
 								triggerAmmo _projectile;
 							} else {
 								_projectile setVariable [
