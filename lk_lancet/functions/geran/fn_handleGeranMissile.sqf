@@ -152,12 +152,23 @@ private _getScreenRect = {
 	[_left, _top, _width, _height]
 };
 
-private _grain = ppEffectCreate ["FilmGrain", 2001];
+private _createGeranPPEffect = {
+	params ["_type", "_priority"];
+
+	private _effect = -1;
+	while {_effect < 0} do {
+		_effect = ppEffectCreate [_type, _priority];
+		_priority = _priority + 1;
+	};
+	_effect
+};
+
+private _grain = ["FilmGrain", 2001] call _createGeranPPEffect;
 _grain ppEffectAdjust [0.18, 1, 1, 0.45, 0.45, true];
 _grain ppEffectCommit 0;
 _grain ppEffectEnable true;
 
-private _blur = ppEffectCreate ["DynamicBlur", 2002];
+private _blur = ["DynamicBlur", 2002] call _createGeranPPEffect;
 _blur ppEffectAdjust [0];
 _blur ppEffectCommit 0;
 _blur ppEffectEnable true;
