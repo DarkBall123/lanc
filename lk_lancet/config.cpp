@@ -550,46 +550,46 @@ class CfgVehicles
 				{
 					"FakeMagazine"
 				};
-				cameraDir="look";
+				cameraDir="";
 				gunnerAction="Mortar_Gunner";
 				gunnergetInAction="";
 				gunnergetOutAction="";
-				elevationMode=1;
+				elevationMode=0;
 				initCamElev=0;
-				minCamElev=-35;
-				maxCamElev=35;
+				minCamElev=0;
+				maxCamElev=0;
 				initElev=0;
-				minTurn=-180;
-				maxTurn=180;
+				minTurn=-0;
+				maxTurn=0;
 				initTurn=0;
-				discreteDistance[]={100,200,300,400,500,700,1000,1600,2000,2400,2800};
+				discreteDistance[]={100};
 				discreteDistanceCameraPoint[]=
 				{
-					"otocvez"
+					"eye"
 				};
-				discreteDistanceInitIndex=5;
+				discreteDistanceInitIndex=0;
 				gunnerForceOptics=0;
-				memoryPointGunnerOptics="otocvez";
+				memoryPointGunnerOptics="eye";
 				disableSoundAttenuation=1;
 				class ViewOptics: ViewOptics
 				{
 					initAngleX=0;
-					minAngleX=-30;
-					maxAngleX=30;
+					minAngleX=0;
+					maxAngleX=0;
 					initAngleY=0;
-					minAngleY=-100;
-					maxAngleY=100;
-					initFov=0.17399999;
-					minFov=0.0077777999;
-					maxFov=0.14;
+					minAngleY=-0;
+					maxAngleY=0;
+					initFov=1.25;
+					minFov=1.25;
+					maxFov=1.25;
 					visionMode[]=
 					{
 						"Normal",
 						"NVG"
 					};
 				};
-				minelev=-30;
-				maxelev=13;
+				minelev=0;
+				maxelev=0;
 				ejectDeadGunner=1;
 				usepip=2;
 			};
