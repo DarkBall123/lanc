@@ -186,29 +186,70 @@ private _handle = [{
 					_terminalLocked = true;
 					_projectile setVariable ["lancet_geran_terminalLocked", true];
 					_projectile setVariable ["lancet_geran_guidanceMode", "TERMINAL"];
+					_projectile setVariable ["lancet_geran_terminalMinDistance", _distanceToAim];
+					_projectile setVariable ["lancet_geran_terminalMissDetonateAt", -1];
 				};
 
-				private _frameTravel = (velocity _projectile) vectorMultiply _deltaTime;
-				private _frameTravelSquared = _frameTravel vectorDotProduct _frameTravel;
-				private _closestDistance = _distanceToAim;
+				private _missDetonateAt = _projectile getVariable [
+					"lancet_geran_terminalMissDetonateAt",
+					-1
+				];
 
-				if (_frameTravelSquared > 0) then {
-					private _toAim = _aimPointASL vectorDiff _projectilePosASL;
-					private _travelFraction = (
-						(_toAim vectorDotProduct _frameTravel) / _frameTravelSquared
-					) max 0 min 1;
-					private _closestPosition = _projectilePosASL vectorAdd (
-						_frameTravel vectorMultiply _travelFraction
-					);
-					_closestDistance = _closestPosition vectorDistance _aimPointASL;
-				};
-
-				if (_terminalLocked && {_closestDistance <= 12}) then {
-					triggerAmmo _projectile;
+				if (_missDetonateAt >= 0) then {
+					if (diag_tickTime >= _missDetonateAt) then {
+						triggerAmmo _projectile;
+					};
 				} else {
-					_desiredDirection = vectorNormalized (
-						_aimPointASL vectorDiff _projectilePosASL
-					);
+					private _velocity = velocity _projectile;
+					private _toAim = _aimPointASL vectorDiff _projectilePosASL;
+					private _frameTravel = _velocity vectorMultiply _deltaTime;
+					private _frameTravelSquared = _frameTravel vectorDotProduct _frameTravel;
+					private _closestDistance = _distanceToAim;
+
+					if (_frameTravelSquared > 0) then {
+						private _travelFraction = (
+							(_toAim vectorDotProduct _frameTravel) / _frameTravelSquared
+						) max 0 min 1;
+						private _closestPosition = _projectilePosASL vectorAdd (
+							_frameTravel vectorMultiply _travelFraction
+						);
+						_closestDistance = _closestPosition vectorDistance _aimPointASL;
+					};
+
+					private _minimumDistance = _distanceToAim;
+					private _passedAim = false;
+
+					if (_terminalLocked) then {
+						_minimumDistance = (
+							_projectile getVariable [
+								"lancet_geran_terminalMinDistance",
+								_distanceToAim
+							]
+						) min _closestDistance;
+						_projectile setVariable [
+							"lancet_geran_terminalMinDistance",
+							_minimumDistance
+						];
+						_passedAim = (_velocity vectorDotProduct _toAim) <= 0;
+					};
+
+					if (_terminalLocked && {_closestDistance <= 12}) then {
+						triggerAmmo _projectile;
+					} else {
+						if (_terminalLocked && {_passedAim}) then {
+							if (_minimumDistance <= 30) then {
+								triggerAmmo _projectile;
+							} else {
+								_projectile setVariable [
+									"lancet_geran_terminalMissDetonateAt",
+									diag_tickTime + 1.5
+								];
+								_projectile setVariable ["lancet_geran_turnSpeed", 0];
+							};
+						} else {
+							_desiredDirection = vectorNormalized _toAim;
+						};
+					};
 				};
 			};
 		};

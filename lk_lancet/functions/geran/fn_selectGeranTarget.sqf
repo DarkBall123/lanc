@@ -151,6 +151,8 @@ _projectile setVariable ["lancet_geran_aimPointASL", _targetPointASL];
 _projectile setVariable ["lancet_geran_lastKnownASL", _targetPointASL];
 _projectile setVariable ["lancet_geran_targetVisible", !isNull _targetObject];
 _projectile setVariable ["lancet_geran_terminalLocked", false];
+_projectile setVariable ["lancet_geran_terminalMinDistance", -1];
+_projectile setVariable ["lancet_geran_terminalMissDetonateAt", -1];
 _projectile setVariable ["lancet_geran_guidanceMode", "DIVE"];
 _projectile setVariable ["lancet_geran_nextTrackCheck", 0];
 _projectile setVariable ["lancet_geran_turnSpeed", 0];
