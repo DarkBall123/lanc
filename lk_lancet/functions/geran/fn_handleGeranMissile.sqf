@@ -629,26 +629,66 @@ while {alive _projectile && {!isNull _display}} do {
 	getMousePosition params ["_mouseX", "_mouseY"];
 	private _cursorX = _mouseX - safeZoneX;
 	private _cursorY = _mouseY - safeZoneY;
-	private _gapX = 13 * pixelW;
-	private _gapY = 13 * pixelH;
-	private _armWidth = 28 * pixelW;
-	private _armHeight = 28 * pixelH;
-	private _cursorPositions = [
-		[_cursorX - _gapX - _armWidth, _cursorY - (2 * pixelH), _armWidth, 4 * pixelH],
-		[_cursorX + _gapX, _cursorY - (2 * pixelH), _armWidth, 4 * pixelH],
-		[_cursorX - (2 * pixelW), _cursorY - _gapY - _armHeight, 4 * pixelW, _armHeight],
-		[_cursorX - (2 * pixelW), _cursorY + _gapY, 4 * pixelW, _armHeight],
-		[_cursorX - _gapX - _armWidth, _cursorY - pixelH, _armWidth, 2 * pixelH],
-		[_cursorX + _gapX, _cursorY - pixelH, _armWidth, 2 * pixelH],
-		[_cursorX - pixelW, _cursorY - _gapY - _armHeight, 2 * pixelW, _armHeight],
-		[_cursorX - pixelW, _cursorY + _gapY, 2 * pixelW, _armHeight]
-	];
+	if (_manual) then {
+		private _manualHalfWidth = 75 * pixelW;
+		private _manualHalfHeight = 60 * pixelH;
+		private _manualCursorPositions = [
+			[_cursorX - _manualHalfWidth, _cursorY - (3 * pixelH), 2 * _manualHalfWidth, 6 * pixelH],
+			[_cursorX - (3 * pixelW), _cursorY - _manualHalfHeight, 6 * pixelW, 2 * _manualHalfHeight],
+			[],
+			[],
+			[_cursorX - _manualHalfWidth, _cursorY - pixelH, 2 * _manualHalfWidth, 2 * pixelH],
+			[_cursorX - pixelW, _cursorY - _manualHalfHeight, 2 * pixelW, 2 * _manualHalfHeight],
+			[],
+			[]
+		];
 
-	{
-		_x ctrlSetPosition (_cursorPositions # _forEachIndex);
-		_x ctrlShow true;
-		_x ctrlCommit 0;
-	} forEach _cursorControls;
+		{
+			private _position = _manualCursorPositions # _forEachIndex;
+			if (_position isEqualTo []) then {
+				_x ctrlShow false;
+			} else {
+				_x ctrlSetPosition _position;
+				_x ctrlSetBackgroundColor (
+					if (_forEachIndex < 4) then {
+						[0.02, 0.08, 0.01, 0.85]
+					} else {
+						[0.32, 1, 0.04, 0.98]
+					}
+				);
+				_x ctrlShow true;
+				_x ctrlCommit 0;
+			};
+		} forEach _cursorControls;
+	} else {
+		private _gapX = 13 * pixelW;
+		private _gapY = 13 * pixelH;
+		private _armWidth = 28 * pixelW;
+		private _armHeight = 28 * pixelH;
+		private _cursorPositions = [
+			[_cursorX - _gapX - _armWidth, _cursorY - (2 * pixelH), _armWidth, 4 * pixelH],
+			[_cursorX + _gapX, _cursorY - (2 * pixelH), _armWidth, 4 * pixelH],
+			[_cursorX - (2 * pixelW), _cursorY - _gapY - _armHeight, 4 * pixelW, _armHeight],
+			[_cursorX - (2 * pixelW), _cursorY + _gapY, 4 * pixelW, _armHeight],
+			[_cursorX - _gapX - _armWidth, _cursorY - pixelH, _armWidth, 2 * pixelH],
+			[_cursorX + _gapX, _cursorY - pixelH, _armWidth, 2 * pixelH],
+			[_cursorX - pixelW, _cursorY - _gapY - _armHeight, 2 * pixelW, _armHeight],
+			[_cursorX - pixelW, _cursorY + _gapY, 2 * pixelW, _armHeight]
+		];
+
+		{
+			_x ctrlSetPosition (_cursorPositions # _forEachIndex);
+			_x ctrlSetBackgroundColor (
+				if (_forEachIndex < 4) then {
+					[0.01, 0.015, 0.02, 0.78]
+				} else {
+					[1, 1, 1, 0.96]
+				}
+			);
+			_x ctrlShow true;
+			_x ctrlCommit 0;
+		} forEach _cursorControls;
+	};
 
 	uiSleep 0.01;
 };
