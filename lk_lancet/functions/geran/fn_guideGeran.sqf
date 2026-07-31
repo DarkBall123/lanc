@@ -251,22 +251,14 @@ private _handle = [{
 							&& {_distanceToAim >= (_minimumDistance + 3)};
 					};
 
-					if (_terminalLocked && {_closestDistance <= 2}) then {
-						triggerAmmo _projectile;
+					if (_terminalLocked && {_passedAim}) then {
+						_projectile setVariable [
+							"lancet_geran_terminalMissDetonateAt",
+							diag_tickTime + 1.5
+						];
+						_projectile setVariable ["lancet_geran_turnSpeed", 0];
 					} else {
-						if (_terminalLocked && {_passedAim}) then {
-							if (_minimumDistance <= 2) then {
-								triggerAmmo _projectile;
-							} else {
-								_projectile setVariable [
-									"lancet_geran_terminalMissDetonateAt",
-									diag_tickTime + 1.5
-								];
-								_projectile setVariable ["lancet_geran_turnSpeed", 0];
-							};
-						} else {
-							_desiredDirection = vectorNormalized _toAim;
-						};
+						_desiredDirection = vectorNormalized _toAim;
 					};
 				};
 			};
