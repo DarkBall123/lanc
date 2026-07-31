@@ -265,11 +265,14 @@ private _handle = [{
 		};
 
 		if (_desiredDirection isNotEqualTo [0, 0, 0]) then {
+			private _attackGuidance = _mode in ["DIVE", "TERMINAL"];
+			private _activeTurnRate = if (_attackGuidance) then {_turnRate * 2} else {_turnRate};
+			private _turnGain = if (_attackGuidance) then {6} else {2};
 			private _angle = acos (((_currentDirection vectorCos _desiredDirection) max -1) min 1);
-			private _desiredTurnSpeed = (_angle * 2) min _turnRate;
+			private _desiredTurnSpeed = (_angle * _turnGain) min _activeTurnRate;
 			private _turnSpeed = _projectile getVariable ["lancet_geran_turnSpeed", 0];
 			private _previousTurnSpeed = _turnSpeed;
-			private _maxSpeedChange = (_turnRate * 2) * _deltaTime;
+			private _maxSpeedChange = (_activeTurnRate * 2) * _deltaTime;
 
 			if (_turnSpeed < _desiredTurnSpeed) then {
 				_turnSpeed = (_turnSpeed + _maxSpeedChange) min _desiredTurnSpeed;
