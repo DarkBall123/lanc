@@ -53,14 +53,14 @@ class CfgPatches
 class cfgammo
 {
 	class M_Jian_AT;
-	class ammo_Penetrator_Base;
-	class m_geran_penetrator: ammo_Penetrator_Base
+	class ammo_Penetrator_Vorona;
+	class m_geran_penetrator: ammo_Penetrator_Vorona
 	{
-		hit=460;
+		hit=480;
 		indirectHit=0;
 		indirectHitRange=0;
 		caliber=30;
-		warheadName="HEAT";
+		warheadName="TandemHEAT";
 	};
 	class m_lancet_dummy: M_Jian_AT
 	{
@@ -133,6 +133,7 @@ class cfgammo
 		modelspecial="\lk_lancet\shahed4.p3d";
 		model="\lk_lancet\shahed4.p3d";
 		submunitionAmmo="m_geran_penetrator";
+		submunitionInitialOffset[]={0,0,-0.1};
 		soundFly[]=
 		{
 			"A3\Sounds_F_Jets\vehicles\air\UAV_05\B_UAV_05_engine_low_ext",
@@ -947,6 +948,7 @@ class CfgVehicles
 		author="DarkBall";
 		displayName="Geran-2 Transport Crate";
 		maximumLoad=0;
+		transportAmmo=0;
 		class EventHandlers
 		{
 			class GeranBox_Init

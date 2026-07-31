@@ -43,6 +43,20 @@ _flightMap ctrlAddEventHandler ["Draw", {
 
 	private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
 	if (!isNull _projectile && {alive _projectile}) then {
+		private _mapMarker = _projectile getVariable ["lancet_geran_mapMarker", []];
+		if (_mapMarker isNotEqualTo []) then {
+			_map drawIcon [
+				"mil_objective",
+				[1, 0.08, 0.04, 1],
+				_mapMarker,
+				30,
+				30,
+				0,
+				"",
+				1
+			];
+		};
+
 		_map drawIcon [
 			"iconPlane",
 			[0.15, 1, 0.25, 1],
@@ -54,6 +68,22 @@ _flightMap ctrlAddEventHandler ["Draw", {
 			1
 		];
 	};
+}];
+_flightMap ctrlAddEventHandler ["MouseButtonDown", {
+	params ["_map", "_button", "_xPos", "_yPos", "_shift", "_control", "_alt"];
+
+	if (_button isEqualTo 0 && {_shift} && {_control} && {!_alt}) exitWith {
+		private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+		if (!isNull _projectile && {alive _projectile}) then {
+			_projectile setVariable [
+				"lancet_geran_mapMarker",
+				_map ctrlMapScreenToWorld [_xPos, _yPos]
+			];
+		};
+		true
+	};
+
+	false
 }];
 
 private _cursorControls = [
@@ -184,18 +214,66 @@ private _createGeranPPEffect = {
 	_effect
 };
 
+private _blur = ["DynamicBlur", 500] call _createGeranPPEffect;
+_blur ppEffectEnable true;
+
 private _grain = ["FilmGrain", 2001] call _createGeranPPEffect;
-_grain ppEffectAdjust [0.18, 1, 1, 0.45, 0.45, true];
-_grain ppEffectCommit 0;
 _grain ppEffectEnable true;
 
-private _blur = ["DynamicBlur", 500] call _createGeranPPEffect;
-_blur ppEffectAdjust [0];
-_blur ppEffectCommit 0;
-_blur ppEffectEnable true;
-uiNamespace setVariable ["lancet_geran_blur", _blur];
+private _colorCorrections = ["ColorCorrections", 1501] call _createGeranPPEffect;
+_colorCorrections ppEffectAdjust [
+	1.13,
+	0.99,
+	0,
+	[0, 0, 0, 0],
+	[1, 1, 1, 1],
+	[0.33, 0.33, 0.33, 0],
+	[0, 0, 0, 0, 0, 0, 4]
+];
+_colorCorrections ppEffectCommit 0;
+_colorCorrections ppEffectEnable true;
 
-private _effects = [_grain, _blur];
+uiNamespace setVariable ["lancet_geran_blur", _blur];
+uiNamespace setVariable ["lancet_geran_grain", _grain];
+
+private _setZoomEffects = {
+	params ["_fov", ["_duration", 0]];
+
+	private _blurStrength = 0.2;
+	private _grainStrength = 0.02;
+
+	if (_fov < 0.1) then {
+		if (_fov >= 0.05) then {
+			_blurStrength = linearConversion [0.05, 0.1, _fov, 0.45, 0.2, true];
+			_grainStrength = linearConversion [0.05, 0.1, _fov, 0.04, 0.02, true];
+		} else {
+			if (_fov >= 0.025) then {
+				_blurStrength = linearConversion [0.025, 0.05, _fov, 0.6, 0.45, true];
+				_grainStrength = linearConversion [0.025, 0.05, _fov, 0.06, 0.04, true];
+			} else {
+				_blurStrength = linearConversion [0.0125, 0.025, _fov, 1.2, 0.6, true];
+				_grainStrength = linearConversion [0.0125, 0.025, _fov, 0.09, 0.06, true];
+			};
+		};
+	};
+
+	private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
+	if (_blur >= 0) then {
+		_blur ppEffectAdjust [_blurStrength];
+		_blur ppEffectCommit _duration;
+	};
+
+	private _grain = uiNamespace getVariable ["lancet_geran_grain", -1];
+	if (_grain >= 0) then {
+		_grain ppEffectAdjust [_grainStrength, 0.2, 3.96, 0.12, 0.12, true];
+		_grain ppEffectCommit _duration;
+	};
+};
+
+uiNamespace setVariable ["lancet_geran_setZoomEffects", _setZoomEffects];
+[uiNamespace getVariable ["lancet_geran_userFov", 0.75], 0] call _setZoomEffects;
+
+private _effects = [_blur, _grain, _colorCorrections];
 
 if ((_projectile getVariable ["lancet_geran_explodeEH", -1]) < 0) then {
 	private _explodeEH = _projectile addEventHandler ["Explode", {
@@ -487,18 +565,14 @@ _display displayAddEventHandler ["MouseZChanged", {
 	_camera camSetFov _fov;
 	_camera camCommit 0.15;
 
-	private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
-	if (_blur >= 0) then {
-		private _blurFactor = linearConversion [0.08, 0.55, _fov, 1, 0, true];
-		_blurFactor = _blurFactor * _blurFactor * (3 - (2 * _blurFactor));
-		_blur ppEffectAdjust [0.16 * _blurFactor];
-		_blur ppEffectCommit 0.25;
-	};
+	[_fov, 0.15] call (uiNamespace getVariable ["lancet_geran_setZoomEffects", {}]);
 	true
 }];
 
 private _nextScan = 0;
 private _targets = [];
+private _displayedFlightAngle = 0;
+private _flightAngleInitialized = false;
 
 while {alive _projectile && {!isNull _display}} do {
 	private _now = diag_tickTime;
@@ -621,10 +695,26 @@ while {alive _projectile && {!isNull _display}} do {
 		_flightVector = vectorDir _projectile;
 	};
 	_flightVector = vectorNormalized _flightVector;
-	private _attackAngle = acos (
-		(((vectorDir _projectile) vectorCos _flightVector) max -1) min 1
+	private _horizontalSpeed = sqrt (
+		((_flightVector # 0) * (_flightVector # 0))
+		+ ((_flightVector # 1) * (_flightVector # 1))
 	);
-	_attackAngleControl ctrlSetText format ["%1°", _attackAngle toFixed 2];
+	private _flightAngle = (_flightVector # 2) atan2 _horizontalSpeed;
+
+	if (!_flightAngleInitialized) then {
+		_displayedFlightAngle = _flightAngle;
+		_flightAngleInitialized = true;
+	} else {
+		private _angleDeltaTime = (diag_deltaTime max 0.001) min 0.1;
+		private _angleBlend = _angleDeltaTime / (0.2 + _angleDeltaTime);
+		_displayedFlightAngle = _displayedFlightAngle
+			+ ((_flightAngle - _displayedFlightAngle) * _angleBlend);
+	};
+
+	if (abs _displayedFlightAngle < 0.005) then {
+		_displayedFlightAngle = 0;
+	};
+	_attackAngleControl ctrlSetText format ["%1°", _displayedFlightAngle toFixed 2];
 
 	getMousePosition params ["_mouseX", "_mouseY"];
 	private _cursorX = _mouseX - safeZoneX;
@@ -724,6 +814,8 @@ if ((uiNamespace getVariable ["lancet_geran_camera", objNull]) isEqualTo _camera
 	uiNamespace setVariable ["lancet_geran_dragStart", nil];
 	uiNamespace setVariable ["lancet_geran_dragActive", nil];
 	uiNamespace setVariable ["lancet_geran_blur", nil];
+	uiNamespace setVariable ["lancet_geran_grain", nil];
+	uiNamespace setVariable ["lancet_geran_setZoomEffects", nil];
 	uiNamespace setVariable ["lancet_geran_mapOpen", nil];
 	uiNamespace setVariable [
 		"lancet_geran_fovPulse",

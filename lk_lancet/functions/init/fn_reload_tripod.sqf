@@ -33,6 +33,7 @@ if ((_objectType find "geran") > -1) exitWith {
             _box setVariable ["lancet_isConsumed", true, true];
             deleteVehicle _box;
             _object setVehicleAmmo 1;
+            _object setMagazineTurretAmmo ["FakeMagazine", 1, [0]];
         };
     };
 };

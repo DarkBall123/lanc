@@ -103,9 +103,19 @@ _uav setVelocity [
 ];
 _uav setDamage 0;
 
+if (_isGeran) then {
+    _uav setVariable ["lancet_geran_guidanceMode", "MANUAL"];
+    _uav setVariable ["lancet_geran_manualInput", [0, 0]];
+    _uav setVariable ["lancet_geran_manualInputSmoothed", [0, 0]];
+};
+
 private _controlUnits = if (_isGeran) then {[_gunner]} else {[]};
 private _interface = if (_isGeran) then {"geran_seeker"} else {"lancet_seeker"};
 [_unit, _uav, [], 0.65, _interface, _controlUnits] call lancet_fnc_initMissile;
+
+if (_isGeran) then {
+    [_uav] call lancet_fnc_guideGeran;
+};
 
 [_uav, _verticalAngle, _launchSpeed] spawn {
     params ["_uav", "_verticalAngle", "_launchSpeed"];
