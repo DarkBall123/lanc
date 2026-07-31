@@ -251,11 +251,11 @@ private _handle = [{
 							&& {_distanceToAim >= (_minimumDistance + 3)};
 					};
 
-					if (_terminalLocked && {_closestDistance <= 12}) then {
+					if (_terminalLocked && {_closestDistance <= 2}) then {
 						triggerAmmo _projectile;
 					} else {
 						if (_terminalLocked && {_passedAim}) then {
-							if (_minimumDistance <= 12) then {
+							if (_minimumDistance <= 2) then {
 								triggerAmmo _projectile;
 							} else {
 								_projectile setVariable [

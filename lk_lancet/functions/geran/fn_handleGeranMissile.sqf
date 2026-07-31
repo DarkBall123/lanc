@@ -256,6 +256,8 @@ private _setZoomEffects = {
 			};
 		};
 	};
+	_blurStrength = _blurStrength
+		+ linearConversion [0.08, 0.1, _fov, 0.06, 0, true];
 
 	private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
 	if (_blur >= 0) then {
@@ -714,7 +716,7 @@ while {alive _projectile && {!isNull _display}} do {
 	if (abs _displayedFlightAngle < 0.005) then {
 		_displayedFlightAngle = 0;
 	};
-	_attackAngleControl ctrlSetText format ["%1°", _displayedFlightAngle toFixed 2];
+	_attackAngleControl ctrlSetText format ["%1°", round _displayedFlightAngle];
 
 	getMousePosition params ["_mouseX", "_mouseY"];
 	private _cursorX = _mouseX - safeZoneX;
