@@ -173,7 +173,11 @@ private _handle = [{
 				[_handle] call CBA_fnc_removePerFrameHandler;
 			} else {
 				private _projectilePosASL = getPosASLVisual _projectile;
-				private _distanceToAim = _projectilePosASL vectorDistance _aimPointASL;
+				private _guidancePointASL = +_aimPointASL;
+				if !(_projectile getVariable ["lancet_geran_objectTarget", false]) then {
+					_guidancePointASL set [2, (_guidancePointASL # 2) - 0.75];
+				};
+				private _distanceToAim = _projectilePosASL vectorDistance _guidancePointASL;
 				private _terminalLocked = _projectile getVariable [
 					"lancet_geran_terminalLocked",
 					false
@@ -202,7 +206,7 @@ private _handle = [{
 					};
 				} else {
 					private _velocity = velocity _projectile;
-					private _toAim = _aimPointASL vectorDiff _projectilePosASL;
+					private _toAim = _guidancePointASL vectorDiff _projectilePosASL;
 					private _frameTravel = _velocity vectorMultiply _deltaTime;
 					private _frameTravelSquared = _frameTravel vectorDotProduct _frameTravel;
 					private _closestDistance = _distanceToAim;

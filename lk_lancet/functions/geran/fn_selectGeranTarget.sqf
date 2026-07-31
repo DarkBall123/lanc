@@ -86,7 +86,13 @@ private _bestScore = -10000000000;
 
 if (!isNull _targetObject) then {
 	private _bounds = boundingBoxReal _targetObject;
-	_targetOffsetModel = ((_bounds # 0) vectorAdd (_bounds # 1)) vectorMultiply 0.5;
+	private _minimum = _bounds # 0;
+	private _maximum = _bounds # 1;
+	_targetOffsetModel = (_minimum vectorAdd _maximum) vectorMultiply 0.5;
+	_targetOffsetModel set [
+		2,
+		(_minimum # 2) + (((_maximum # 2) - (_minimum # 2)) * 0.35)
+	];
 
 	_targetPointASL = AGLToASL (_targetObject modelToWorldVisual _targetOffsetModel);
 } else {
