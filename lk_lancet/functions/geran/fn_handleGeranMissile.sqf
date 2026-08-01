@@ -47,7 +47,7 @@ _flightMap ctrlAddEventHandler ["Draw", {
 		if (_mapMarker isNotEqualTo []) then {
 			_map drawIcon [
 				"mil_objective",
-				[1, 0.08, 0.04, 1],
+				[0.15, 1, 0.25, 1],
 				_mapMarker,
 				30,
 				30,
@@ -615,11 +615,7 @@ while {alive _projectile && {!isNull _display}} do {
 					if (_rect isNotEqualTo []) then {
 						private _selected = _target isEqualTo _selectedTarget;
 						private _color = if (_selected) then {
-							if (_terminal) then {
-								[1, 0.08, 0.05, 0.96]
-							} else {
-								[0.12, 1, 0.28, 0.94]
-							}
+							[0.12, 1, 0.28, 0.94]
 						} else {
 							[1, 0.74, 0.04, 0.88]
 						};
@@ -654,7 +650,7 @@ while {alive _projectile && {!isNull _display}} do {
 	if (!_manual && {_mode in ["DIVE", "TERMINAL"]} && {_aimPointASL isNotEqualTo []}) then {
 		if (_terminal) then {
 			_showTrackMarker = !_selectedDrawn;
-			_trackColor = [1, 0.08, 0.05, 0.96];
+			_trackColor = [0.12, 1, 0.28, 0.95];
 		} else {
 			if (!_objectTarget) then {
 				_showTrackMarker = true;
