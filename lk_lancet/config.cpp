@@ -53,13 +53,13 @@ class CfgPatches
 class cfgammo
 {
 	class M_Jian_AT;
-	class ammo_Penetrator_Vorona;
-	class m_geran_penetrator: ammo_Penetrator_Vorona
+	class ammo_Penetrator_Jian;
+	class m_geran_penetrator: ammo_Penetrator_Jian
 	{
-		hit=480;
-		indirectHit=0;
-		indirectHitRange=0;
-		caliber=30;
+		hit=1700;
+		indirectHit=1600;
+		indirectHitRange=1;
+		caliber=66;
 		warheadName="TandemHEAT";
 	};
 	class m_lancet_dummy: M_Jian_AT
@@ -190,10 +190,10 @@ class cfgammo
 			0.2
 		};
 		warheadName="HE";
-		hit=460;
-		indirectHit=230;
-		indirectHitRange=38;
-		dangerRadiusHit=850;
+		hit=2800;
+		indirectHit=500;
+		indirectHitRange=32;
+		dangerRadiusHit=1250;
 		explosionDir="explosionDir";
 		explosionEffects="HeavyBombExplosion";
 		explosionEffectsDir="explosionDir";
