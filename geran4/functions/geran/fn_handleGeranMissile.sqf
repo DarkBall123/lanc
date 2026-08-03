@@ -258,6 +258,8 @@ private _setZoomEffects = {
 	};
 	_blurStrength = _blurStrength
 		+ linearConversion [0.08, 0.1, _fov, 0.06, 0, true];
+	_grainStrength = _grainStrength
+		+ linearConversion [0.08, 0.1, _fov, 0.03, 0, true];
 
 	private _blur = uiNamespace getVariable ["geran4_blur", -1];
 	if (_blur >= 0) then {
