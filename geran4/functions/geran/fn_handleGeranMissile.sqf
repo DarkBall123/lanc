@@ -8,7 +8,7 @@ private _dialogName = param [3, "geran_seeker"];
 if (isNull _projectile || {!alive _projectile}) exitWith {};
 if (!isNull (findDisplay GERAN_IDD_SEEKER)) exitWith {};
 
-private _camera = [_projectile, 2] call lancet_fnc_camCreate;
+private _camera = [_projectile, 2] call geran4_fnc_camCreate;
 private _display = createDialog [_dialogName, true];
 
 if (isNull _display) exitWith {
@@ -16,22 +16,22 @@ if (isNull _display) exitWith {
 	camDestroy _camera;
 };
 
-uiNamespace setVariable ["lancet_geran_camera", _camera];
-uiNamespace setVariable ["lancet_geran_projectile", _projectile];
-uiNamespace setVariable ["lancet_geran_userFov", 0.75];
-uiNamespace setVariable ["lancet_geran_dragStart", []];
-uiNamespace setVariable ["lancet_geran_dragActive", false];
-uiNamespace setVariable ["lancet_geran_drawnCandidates", []];
-uiNamespace setVariable ["lancet_geran_mapOpen", false];
+uiNamespace setVariable ["geran4_camera", _camera];
+uiNamespace setVariable ["geran4_projectile", _projectile];
+uiNamespace setVariable ["geran4_userFov", 0.75];
+uiNamespace setVariable ["geran4_dragStart", []];
+uiNamespace setVariable ["geran4_dragActive", false];
+uiNamespace setVariable ["geran4_drawnCandidates", []];
+uiNamespace setVariable ["geran4_mapOpen", false];
 
-if ((_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL") then {
-	_projectile setVariable ["lancet_geran_manualInput", [0, 0]];
-	_projectile setVariable ["lancet_geran_manualInputSmoothed", [0, 0]];
+if ((_projectile getVariable ["geran4_guidanceMode", "CRUISE"]) isEqualTo "MANUAL") then {
+	_projectile setVariable ["geran4_manualInput", [0, 0]];
+	_projectile setVariable ["geran4_manualInputSmoothed", [0, 0]];
 	setMousePosition [0.5, 0.5];
-	[_projectile] call lancet_fnc_guideGeran;
+	[_projectile] call geran4_fnc_guideGeran;
 };
 
-private _thermal = _projectile getVariable ["lancet_geran_thermal", false];
+private _thermal = _projectile getVariable ["geran4_thermal", false];
 _thermal setCamUseTI 0;
 
 private _hudGroup = _display displayCtrl GERAN_IDC_HUD_GROUP;
@@ -41,9 +41,9 @@ _flightMap ctrlMapCursor ["", "BlankCursor"];
 _flightMap ctrlAddEventHandler ["Draw", {
 	params ["_map"];
 
-	private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+	private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 	if (!isNull _projectile && {alive _projectile}) then {
-		private _mapMarker = _projectile getVariable ["lancet_geran_mapMarker", []];
+		private _mapMarker = _projectile getVariable ["geran4_mapMarker", []];
 		if (_mapMarker isNotEqualTo []) then {
 			_map drawIcon [
 				"mil_objective",
@@ -73,10 +73,10 @@ _flightMap ctrlAddEventHandler ["MouseButtonDown", {
 	params ["_map", "_button", "_xPos", "_yPos", "_shift", "_control", "_alt"];
 
 	if (_button isEqualTo 0 && {_shift} && {_control} && {!_alt}) exitWith {
-		private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+		private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 		if (!isNull _projectile && {alive _projectile}) then {
 			_projectile setVariable [
-				"lancet_geran_mapMarker",
+				"geran4_mapMarker",
 				_map ctrlMapScreenToWorld [_xPos, _yPos]
 			];
 		};
@@ -140,7 +140,7 @@ private _drawFrame = {
 	} forEach _lines;
 };
 
-uiNamespace setVariable ["lancet_geran_drawFrame", _drawFrame];
+uiNamespace setVariable ["geran4_drawFrame", _drawFrame];
 
 private _boxControls = [];
 for "_boxIndex" from 0 to 15 do {
@@ -233,8 +233,8 @@ _colorCorrections ppEffectAdjust [
 _colorCorrections ppEffectCommit 0;
 _colorCorrections ppEffectEnable true;
 
-uiNamespace setVariable ["lancet_geran_blur", _blur];
-uiNamespace setVariable ["lancet_geran_grain", _grain];
+uiNamespace setVariable ["geran4_blur", _blur];
+uiNamespace setVariable ["geran4_grain", _grain];
 
 private _setZoomEffects = {
 	params ["_fov", ["_duration", 0]];
@@ -259,30 +259,30 @@ private _setZoomEffects = {
 	_blurStrength = _blurStrength
 		+ linearConversion [0.08, 0.1, _fov, 0.06, 0, true];
 
-	private _blur = uiNamespace getVariable ["lancet_geran_blur", -1];
+	private _blur = uiNamespace getVariable ["geran4_blur", -1];
 	if (_blur >= 0) then {
 		_blur ppEffectAdjust [_blurStrength];
 		_blur ppEffectCommit _duration;
 	};
 
-	private _grain = uiNamespace getVariable ["lancet_geran_grain", -1];
+	private _grain = uiNamespace getVariable ["geran4_grain", -1];
 	if (_grain >= 0) then {
 		_grain ppEffectAdjust [_grainStrength, 0.2, 3.96, 0.12, 0.12, true];
 		_grain ppEffectCommit _duration;
 	};
 };
 
-uiNamespace setVariable ["lancet_geran_setZoomEffects", _setZoomEffects];
-[uiNamespace getVariable ["lancet_geran_userFov", 0.75], 0] call _setZoomEffects;
+uiNamespace setVariable ["geran4_setZoomEffects", _setZoomEffects];
+[uiNamespace getVariable ["geran4_userFov", 0.75], 0] call _setZoomEffects;
 
 private _effects = [_blur, _grain, _colorCorrections];
 
-if ((_projectile getVariable ["lancet_geran_explodeEH", -1]) < 0) then {
+if ((_projectile getVariable ["geran4_explodeEH", -1]) < 0) then {
 	private _explodeEH = _projectile addEventHandler ["Explode", {
 		params ["_projectile"];
-		deleteVehicle (_projectile getVariable ["DB_lancet_subUAV", objNull]);
+		deleteVehicle (_projectile getVariable ["DB_geran4_visualUAV", objNull]);
 	}];
-	_projectile setVariable ["lancet_geran_explodeEH", _explodeEH];
+	_projectile setVariable ["geran4_explodeEH", _explodeEH];
 };
 
 _display displayAddEventHandler ["KeyDown", {
@@ -294,9 +294,9 @@ _display displayAddEventHandler ["KeyDown", {
 		private _map = _display displayCtrl GERAN_IDC_MAP;
 		private _mapFrame = _display displayCtrl GERAN_IDC_MAP_FRAME;
 		private _hud = _display displayCtrl GERAN_IDC_HUD_GROUP;
-		private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+		private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 
-		uiNamespace setVariable ["lancet_geran_mapOpen", _open];
+		uiNamespace setVariable ["geran4_mapOpen", _open];
 		_map ctrlShow _open;
 		_mapFrame ctrlShow _open;
 		_hud ctrlShow !_open;
@@ -304,8 +304,8 @@ _display displayAddEventHandler ["KeyDown", {
 		if (_open) then {
 			_map ctrlMapCursor ["", "Arrow"];
 			if (!isNull _projectile) then {
-				_projectile setVariable ["lancet_geran_manualInput", [0, 0]];
-				_projectile setVariable ["lancet_geran_manualInputSmoothed", [0, 0]];
+				_projectile setVariable ["geran4_manualInput", [0, 0]];
+				_projectile setVariable ["geran4_manualInputSmoothed", [0, 0]];
 				_map ctrlMapAnimAdd [0, 0.08, _projectile];
 				ctrlMapAnimCommit _map;
 			};
@@ -314,7 +314,7 @@ _display displayAddEventHandler ["KeyDown", {
 			_map ctrlMapCursor ["", "BlankCursor"];
 			if (
 				!isNull _projectile
-				&& {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
+				&& {(_projectile getVariable ["geran4_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
 			) then {
 				setMousePosition [0.5, 0.5];
 			};
@@ -323,27 +323,27 @@ _display displayAddEventHandler ["KeyDown", {
 
 	switch (_key) do {
 		case 49: {
-			private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+			private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 			if (isNull _projectile) exitWith {true};
 
-			private _thermal = !(_projectile getVariable ["lancet_geran_thermal", false]);
-			_projectile setVariable ["lancet_geran_thermal", _thermal];
+			private _thermal = !(_projectile getVariable ["geran4_thermal", false]);
+			_projectile setVariable ["geran4_thermal", _thermal];
 			_thermal setCamUseTI 0;
 			true
 		};
 		case 20: {
-			private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+			private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 			if (
 				isNull _projectile
-				|| {_projectile getVariable ["lancet_geran_terminalLocked", false]}
+				|| {_projectile getVariable ["geran4_terminalLocked", false]}
 			) exitWith {true};
 
-			private _mode = _projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"];
-			_projectile setVariable ["lancet_geran_manualInput", [0, 0]];
-			_projectile setVariable ["lancet_geran_manualInputSmoothed", [0, 0]];
-			_projectile setVariable ["lancet_geran_turnSpeed", 0];
-			uiNamespace setVariable ["lancet_geran_dragStart", []];
-			uiNamespace setVariable ["lancet_geran_dragActive", false];
+			private _mode = _projectile getVariable ["geran4_guidanceMode", "CRUISE"];
+			_projectile setVariable ["geran4_manualInput", [0, 0]];
+			_projectile setVariable ["geran4_manualInputSmoothed", [0, 0]];
+			_projectile setVariable ["geran4_turnSpeed", 0];
+			uiNamespace setVariable ["geran4_dragStart", []];
+			uiNamespace setVariable ["geran4_dragActive", false];
 
 			{
 				(_display displayCtrl _x) ctrlShow false;
@@ -355,24 +355,24 @@ _display displayAddEventHandler ["KeyDown", {
 			];
 
 			if (_mode isEqualTo "MANUAL") then {
-				_projectile setVariable ["lancet_geran_guidanceMode", "CRUISE"];
+				_projectile setVariable ["geran4_guidanceMode", "CRUISE"];
 			} else {
-				_projectile setVariable ["lancet_geran_targetObject", objNull];
-				_projectile setVariable ["lancet_geran_objectTarget", false];
-				_projectile setVariable ["lancet_geran_targetOffsetModel", [0, 0, 0]];
-				_projectile setVariable ["lancet_geran_aimPointASL", []];
-				_projectile setVariable ["lancet_geran_lastKnownASL", []];
-				_projectile setVariable ["lancet_geran_targetVisible", false];
-				_projectile setVariable ["lancet_geran_nextTrackCheck", 0];
-				_projectile setVariable ["lancet_geran_guidanceMode", "MANUAL"];
+				_projectile setVariable ["geran4_targetObject", objNull];
+				_projectile setVariable ["geran4_objectTarget", false];
+				_projectile setVariable ["geran4_targetOffsetModel", [0, 0, 0]];
+				_projectile setVariable ["geran4_aimPointASL", []];
+				_projectile setVariable ["geran4_lastKnownASL", []];
+				_projectile setVariable ["geran4_targetVisible", false];
+				_projectile setVariable ["geran4_nextTrackCheck", 0];
+				_projectile setVariable ["geran4_guidanceMode", "MANUAL"];
 				setMousePosition [0.5, 0.5];
-				[_projectile] call lancet_fnc_guideGeran;
+				[_projectile] call geran4_fnc_guideGeran;
 			};
 
 			true
 		};
 		case 33: {
-			private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+			private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 			if (!isNull _projectile) then {
 				triggerAmmo _projectile;
 			};
@@ -380,12 +380,12 @@ _display displayAddEventHandler ["KeyDown", {
 			true
 		};
 		case 50: {
-			private _open = !(uiNamespace getVariable ["lancet_geran_mapOpen", false]);
+			private _open = !(uiNamespace getVariable ["geran4_mapOpen", false]);
 			[_display, _open] call _setMapOpen;
 			true
 		};
 		case 1: {
-			if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) then {
+			if (uiNamespace getVariable ["geran4_mapOpen", false]) then {
 				[_display, false] call _setMapOpen;
 			} else {
 				_display closeDisplay 1;
@@ -400,13 +400,13 @@ _display displayAddEventHandler ["KeyDown", {
 
 _display displayAddEventHandler ["MouseButtonDown", {
 	params ["_display", "_button"];
-	if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) exitWith {false};
+	if (uiNamespace getVariable ["geran4_mapOpen", false]) exitWith {false};
 
-	private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+	private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 	private _mode = if (isNull _projectile) then {
 		"CRUISE"
 	} else {
-		_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]
+		_projectile getVariable ["geran4_guidanceMode", "CRUISE"]
 	};
 
 	switch (_button) do {
@@ -414,10 +414,10 @@ _display displayAddEventHandler ["MouseButtonDown", {
 			if (
 				!isNull _projectile
 				&& {_mode isNotEqualTo "MANUAL"}
-				&& {!(_projectile getVariable ["lancet_geran_terminalLocked", false])}
+				&& {!(_projectile getVariable ["geran4_terminalLocked", false])}
 			) then {
-				uiNamespace setVariable ["lancet_geran_dragStart", getMousePosition];
-				uiNamespace setVariable ["lancet_geran_dragActive", false];
+				uiNamespace setVariable ["geran4_dragStart", getMousePosition];
+				uiNamespace setVariable ["geran4_dragActive", false];
 			};
 			true
 		};
@@ -425,17 +425,17 @@ _display displayAddEventHandler ["MouseButtonDown", {
 			if (
 				!isNull _projectile
 				&& {_mode isNotEqualTo "MANUAL"}
-				&& {!(_projectile getVariable ["lancet_geran_terminalLocked", false])}
+				&& {!(_projectile getVariable ["geran4_terminalLocked", false])}
 				&& {_mode isNotEqualTo "CRUISE"}
 			) then {
-				_projectile setVariable ["lancet_geran_targetObject", objNull];
-				_projectile setVariable ["lancet_geran_objectTarget", false];
-				_projectile setVariable ["lancet_geran_targetOffsetModel", [0, 0, 0]];
-				_projectile setVariable ["lancet_geran_aimPointASL", []];
-				_projectile setVariable ["lancet_geran_lastKnownASL", []];
-				_projectile setVariable ["lancet_geran_targetVisible", false];
-				_projectile setVariable ["lancet_geran_guidanceMode", "RECOVER"];
-				[_projectile] call lancet_fnc_guideGeran;
+				_projectile setVariable ["geran4_targetObject", objNull];
+				_projectile setVariable ["geran4_objectTarget", false];
+				_projectile setVariable ["geran4_targetOffsetModel", [0, 0, 0]];
+				_projectile setVariable ["geran4_aimPointASL", []];
+				_projectile setVariable ["geran4_lastKnownASL", []];
+				_projectile setVariable ["geran4_targetVisible", false];
+				_projectile setVariable ["geran4_guidanceMode", "RECOVER"];
+				[_projectile] call geran4_fnc_guideGeran;
 			};
 			true
 		};
@@ -447,13 +447,13 @@ _display displayAddEventHandler ["MouseButtonDown", {
 
 _display displayAddEventHandler ["MouseMoving", {
 	params ["_display"];
-	if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) exitWith {false};
+	if (uiNamespace getVariable ["geran4_mapOpen", false]) exitWith {false};
 
-	private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+	private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 
 	if (
 		!isNull _projectile
-		&& {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
+		&& {(_projectile getVariable ["geran4_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
 	) then {
 		private _current = getMousePosition;
 		private _radiusX = 0.18 * safeZoneW;
@@ -471,19 +471,19 @@ _display displayAddEventHandler ["MouseMoving", {
 			];
 		};
 
-		_projectile setVariable ["lancet_geran_manualInput", [_inputX, _inputY]];
+		_projectile setVariable ["geran4_manualInput", [_inputX, _inputY]];
 	} else {
-		private _start = uiNamespace getVariable ["lancet_geran_dragStart", []];
+		private _start = uiNamespace getVariable ["geran4_dragStart", []];
 
 		if (_start isNotEqualTo []) then {
 			private _current = getMousePosition;
 			private _deltaX = ((_current # 0) - (_start # 0)) / pixelW;
 			private _deltaY = ((_current # 1) - (_start # 1)) / pixelH;
-			private _dragActive = uiNamespace getVariable ["lancet_geran_dragActive", false];
+			private _dragActive = uiNamespace getVariable ["geran4_dragActive", false];
 
 			if (!_dragActive && {sqrt ((_deltaX * _deltaX) + (_deltaY * _deltaY)) > 8}) then {
 				_dragActive = true;
-				uiNamespace setVariable ["lancet_geran_dragActive", true];
+				uiNamespace setVariable ["geran4_dragActive", true];
 			};
 
 			if (_dragActive) then {
@@ -501,7 +501,7 @@ _display displayAddEventHandler ["MouseMoving", {
 				];
 
 				[_lines, _rect, [0.08, 0.48, 1, 0.95]] call (
-					uiNamespace getVariable ["lancet_geran_drawFrame", {}]
+					uiNamespace getVariable ["geran4_drawFrame", {}]
 				);
 			};
 		};
@@ -510,13 +510,13 @@ _display displayAddEventHandler ["MouseMoving", {
 
 _display displayAddEventHandler ["MouseButtonUp", {
 	params ["_display", "_button"];
-	if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) exitWith {false};
+	if (uiNamespace getVariable ["geran4_mapOpen", false]) exitWith {false};
 	if (_button isNotEqualTo 0) exitWith {false};
 
-	private _start = uiNamespace getVariable ["lancet_geran_dragStart", []];
+	private _start = uiNamespace getVariable ["geran4_dragStart", []];
 	private _end = getMousePosition;
-	private _dragActive = uiNamespace getVariable ["lancet_geran_dragActive", false];
-	private _projectile = uiNamespace getVariable ["lancet_geran_projectile", objNull];
+	private _dragActive = uiNamespace getVariable ["geran4_dragActive", false];
+	private _projectile = uiNamespace getVariable ["geran4_projectile", objNull];
 
 	{
 		(_display displayCtrl _x) ctrlShow false;
@@ -527,22 +527,22 @@ _display displayAddEventHandler ["MouseButtonUp", {
 		GERAN_IDC_SELECTION_LEFT
 	];
 
-	uiNamespace setVariable ["lancet_geran_dragStart", []];
-	uiNamespace setVariable ["lancet_geran_dragActive", false];
+	uiNamespace setVariable ["geran4_dragStart", []];
+	uiNamespace setVariable ["geran4_dragActive", false];
 
 	if (
 		!isNull _projectile
 		&& {_start isNotEqualTo []}
-		&& {!(_projectile getVariable ["lancet_geran_terminalLocked", false])}
-		&& {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isNotEqualTo "MANUAL"}
+		&& {!(_projectile getVariable ["geran4_terminalLocked", false])}
+		&& {(_projectile getVariable ["geran4_guidanceMode", "CRUISE"]) isNotEqualTo "MANUAL"}
 	) then {
 		[
 			_projectile,
 			_start,
 			_end,
 			_dragActive,
-			uiNamespace getVariable ["lancet_geran_drawnCandidates", []]
-		] call lancet_fnc_selectGeranTarget;
+			uiNamespace getVariable ["geran4_drawnCandidates", []]
+		] call geran4_fnc_selectGeranTarget;
 	};
 
 	true
@@ -550,24 +550,24 @@ _display displayAddEventHandler ["MouseButtonUp", {
 
 _display displayAddEventHandler ["MouseZChanged", {
 	params ["_display", "_scroll"];
-	if (uiNamespace getVariable ["lancet_geran_mapOpen", false]) exitWith {false};
+	if (uiNamespace getVariable ["geran4_mapOpen", false]) exitWith {false};
 
-	private _camera = uiNamespace getVariable ["lancet_geran_camera", objNull];
+	private _camera = uiNamespace getVariable ["geran4_camera", objNull];
 	if (isNull _camera || {_scroll isEqualTo 0}) exitWith {false};
 
-	private _fov = uiNamespace getVariable ["lancet_geran_userFov", 0.75];
+	private _fov = uiNamespace getVariable ["geran4_userFov", 0.75];
 	private _factor = if (_scroll > 0) then {0.86} else {1.16};
 	_fov = ((_fov * _factor) max 0.08) min 0.75;
 
-	uiNamespace setVariable ["lancet_geran_userFov", _fov];
+	uiNamespace setVariable ["geran4_userFov", _fov];
 	uiNamespace setVariable [
-		"lancet_geran_fovPulse",
-		(uiNamespace getVariable ["lancet_geran_fovPulse", 0]) + 1
+		"geran4_fovPulse",
+		(uiNamespace getVariable ["geran4_fovPulse", 0]) + 1
 	];
 	_camera camSetFov _fov;
 	_camera camCommit 0.15;
 
-	[_fov, 0.15] call (uiNamespace getVariable ["lancet_geran_setZoomEffects", {}]);
+	[_fov, 0.15] call (uiNamespace getVariable ["geran4_setZoomEffects", {}]);
 	true
 }];
 
@@ -578,12 +578,12 @@ private _flightAngleInitialized = false;
 
 while {alive _projectile && {!isNull _display}} do {
 	private _now = diag_tickTime;
-	private _mode = _projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"];
+	private _mode = _projectile getVariable ["geran4_guidanceMode", "CRUISE"];
 	private _manual = _mode isEqualTo "MANUAL";
-	private _selectedTarget = _projectile getVariable ["lancet_geran_targetObject", objNull];
-	private _objectTarget = _projectile getVariable ["lancet_geran_objectTarget", !isNull _selectedTarget];
-	private _targetVisible = _projectile getVariable ["lancet_geran_targetVisible", false];
-	private _terminal = _projectile getVariable ["lancet_geran_terminalLocked", false];
+	private _selectedTarget = _projectile getVariable ["geran4_targetObject", objNull];
+	private _objectTarget = _projectile getVariable ["geran4_objectTarget", !isNull _selectedTarget];
+	private _targetVisible = _projectile getVariable ["geran4_targetVisible", false];
+	private _terminal = _projectile getVariable ["geran4_terminalLocked", false];
 	private _drawnCandidates = [];
 	private _drawnCount = 0;
 	private _selectedDrawn = false;
@@ -597,7 +597,7 @@ while {alive _projectile && {!isNull _display}} do {
 		} forEach _selectionLines;
 	} else {
 		if (_now >= _nextScan) then {
-			_targets = [_projectile] call lancet_fnc_findGeranTargets;
+			_targets = [_projectile] call geran4_fnc_findGeranTargets;
 			_nextScan = _now + 0.25;
 		};
 
@@ -641,9 +641,9 @@ while {alive _projectile && {!isNull _display}} do {
 		};
 	};
 
-	uiNamespace setVariable ["lancet_geran_drawnCandidates", _drawnCandidates];
+	uiNamespace setVariable ["geran4_drawnCandidates", _drawnCandidates];
 
-	private _aimPointASL = _projectile getVariable ["lancet_geran_aimPointASL", []];
+	private _aimPointASL = _projectile getVariable ["geran4_aimPointASL", []];
 	private _showTrackMarker = false;
 	private _trackColor = [0.12, 1, 0.28, 0.95];
 
@@ -783,10 +783,10 @@ while {alive _projectile && {!isNull _display}} do {
 
 if (
 	!isNull _projectile
-	&& {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
+	&& {(_projectile getVariable ["geran4_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
 ) then {
-	_projectile setVariable ["lancet_geran_manualInput", [0, 0]];
-	_projectile setVariable ["lancet_geran_manualInputSmoothed", [0, 0]];
+	_projectile setVariable ["geran4_manualInput", [0, 0]];
+	_projectile setVariable ["geran4_manualInputSmoothed", [0, 0]];
 };
 
 false setCamUseTI 0;
@@ -804,19 +804,19 @@ if (!isNull _camera) then {
 	ppEffectDestroy _x;
 } forEach _effects;
 
-if ((uiNamespace getVariable ["lancet_geran_camera", objNull]) isEqualTo _camera) then {
-	uiNamespace setVariable ["lancet_geran_camera", nil];
-	uiNamespace setVariable ["lancet_geran_projectile", nil];
-	uiNamespace setVariable ["lancet_geran_drawFrame", nil];
-	uiNamespace setVariable ["lancet_geran_drawnCandidates", nil];
-	uiNamespace setVariable ["lancet_geran_dragStart", nil];
-	uiNamespace setVariable ["lancet_geran_dragActive", nil];
-	uiNamespace setVariable ["lancet_geran_blur", nil];
-	uiNamespace setVariable ["lancet_geran_grain", nil];
-	uiNamespace setVariable ["lancet_geran_setZoomEffects", nil];
-	uiNamespace setVariable ["lancet_geran_mapOpen", nil];
+if ((uiNamespace getVariable ["geran4_camera", objNull]) isEqualTo _camera) then {
+	uiNamespace setVariable ["geran4_camera", nil];
+	uiNamespace setVariable ["geran4_projectile", nil];
+	uiNamespace setVariable ["geran4_drawFrame", nil];
+	uiNamespace setVariable ["geran4_drawnCandidates", nil];
+	uiNamespace setVariable ["geran4_dragStart", nil];
+	uiNamespace setVariable ["geran4_dragActive", nil];
+	uiNamespace setVariable ["geran4_blur", nil];
+	uiNamespace setVariable ["geran4_grain", nil];
+	uiNamespace setVariable ["geran4_setZoomEffects", nil];
+	uiNamespace setVariable ["geran4_mapOpen", nil];
 	uiNamespace setVariable [
-		"lancet_geran_fovPulse",
-		(uiNamespace getVariable ["lancet_geran_fovPulse", 0]) + 1
+		"geran4_fovPulse",
+		(uiNamespace getVariable ["geran4_fovPulse", 0]) + 1
 	];
 };

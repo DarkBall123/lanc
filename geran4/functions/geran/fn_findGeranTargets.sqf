@@ -8,8 +8,8 @@ if (_range <= 0) then {
 	_range = 1250;
 };
 
-private _thermal = _projectile getVariable ["lancet_geran_thermal", false];
-private _visualUav = _projectile getVariable ["DB_lancet_subUAV", objNull];
+private _thermal = _projectile getVariable ["geran4_thermal", false];
+private _visualUav = _projectile getVariable ["DB_geran4_visualUAV", objNull];
 private _targets = (_projectile nearEntities [["Air", "LandVehicle", "Ship", "StaticWeapon"], _range]) - [_projectile, _visualUav];
 private _scored = [];
 
@@ -68,7 +68,7 @@ private _scored = [];
 		};
 
 		if (_eligible) then {
-			private _confidence = [_projectile, _x, _thermal, _range] call lancet_fnc_getGeranConfidence;
+			private _confidence = [_projectile, _x, _thermal, _range] call geran4_fnc_getGeranConfidence;
 
 			if (_confidence >= 0.4) then {
 				_scored pushBack [

@@ -3,11 +3,11 @@ params ["_projectile", "_start", "_end", "_isDrag", "_candidates"];
 if (
 	isNull _projectile
 	|| {!alive _projectile}
-	|| {_projectile getVariable ["lancet_geran_terminalLocked", false]}
-	|| {(_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
+	|| {_projectile getVariable ["geran4_terminalLocked", false]}
+	|| {(_projectile getVariable ["geran4_guidanceMode", "CRUISE"]) isEqualTo "MANUAL"}
 ) exitWith {false};
 
-private _wasDiving = (_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "DIVE";
+private _wasDiving = (_projectile getVariable ["geran4_guidanceMode", "CRUISE"]) isEqualTo "DIVE";
 private _config = configOf _projectile;
 private _detectionRange = getNumber (_config >> "geranDetectionRange");
 if (_detectionRange <= 0) then {
@@ -26,7 +26,7 @@ private _traceScreen = {
 	};
 
 	private _rayEndASL = _originASL vectorAdd (_direction vectorMultiply ((_detectionRange * 4) max 5000));
-	private _visualUav = _projectile getVariable ["DB_lancet_subUAV", objNull];
+	private _visualUav = _projectile getVariable ["DB_geran4_visualUAV", objNull];
 	private _hits = lineIntersectsSurfaces [
 		_originASL,
 		_rayEndASL,
@@ -150,33 +150,33 @@ if (!isNull _targetObject) then {
 
 if (_targetPointASL isEqualTo []) exitWith {false};
 
-_projectile setVariable ["lancet_geran_targetObject", _targetObject];
-_projectile setVariable ["lancet_geran_objectTarget", !isNull _targetObject];
-_projectile setVariable ["lancet_geran_targetOffsetModel", _targetOffsetModel];
-_projectile setVariable ["lancet_geran_aimPointASL", _targetPointASL];
-_projectile setVariable ["lancet_geran_lastKnownASL", _targetPointASL];
-_projectile setVariable ["lancet_geran_targetVisible", !isNull _targetObject];
-_projectile setVariable ["lancet_geran_terminalLocked", false];
-_projectile setVariable ["lancet_geran_terminalMinDistance", -1];
-_projectile setVariable ["lancet_geran_terminalMissDetonateAt", -1];
-_projectile setVariable ["lancet_geran_terminalWasApproaching", false];
-_projectile setVariable ["lancet_geran_guidanceMode", "DIVE"];
-_projectile setVariable ["lancet_geran_nextTrackCheck", 0];
-_projectile setVariable ["lancet_geran_turnSpeed", 0];
+_projectile setVariable ["geran4_targetObject", _targetObject];
+_projectile setVariable ["geran4_objectTarget", !isNull _targetObject];
+_projectile setVariable ["geran4_targetOffsetModel", _targetOffsetModel];
+_projectile setVariable ["geran4_aimPointASL", _targetPointASL];
+_projectile setVariable ["geran4_lastKnownASL", _targetPointASL];
+_projectile setVariable ["geran4_targetVisible", !isNull _targetObject];
+_projectile setVariable ["geran4_terminalLocked", false];
+_projectile setVariable ["geran4_terminalMinDistance", -1];
+_projectile setVariable ["geran4_terminalMissDetonateAt", -1];
+_projectile setVariable ["geran4_terminalWasApproaching", false];
+_projectile setVariable ["geran4_guidanceMode", "DIVE"];
+_projectile setVariable ["geran4_nextTrackCheck", 0];
+_projectile setVariable ["geran4_turnSpeed", 0];
 
-[_projectile] call lancet_fnc_guideGeran;
+[_projectile] call geran4_fnc_guideGeran;
 
-private _camera = uiNamespace getVariable ["lancet_geran_camera", objNull];
+private _camera = uiNamespace getVariable ["geran4_camera", objNull];
 if (!isNull _camera && {!_wasDiving}) then {
-	private _userFov = uiNamespace getVariable ["lancet_geran_userFov", 0.75];
-	private _pulse = (uiNamespace getVariable ["lancet_geran_fovPulse", 0]) + 1;
+	private _userFov = uiNamespace getVariable ["geran4_userFov", 0.75];
+	private _pulse = (uiNamespace getVariable ["geran4_fovPulse", 0]) + 1;
 	private _pulseFov = (_userFov * 1.12) min 0.9;
 
-	uiNamespace setVariable ["lancet_geran_fovPulse", _pulse];
+	uiNamespace setVariable ["geran4_fovPulse", _pulse];
 	_camera camSetFov _pulseFov;
 	_camera camCommit 0.2;
 
-	[_pulseFov, 0.2] call (uiNamespace getVariable ["lancet_geran_setZoomEffects", {}]);
+	[_pulseFov, 0.2] call (uiNamespace getVariable ["geran4_setZoomEffects", {}]);
 
 	[_camera, _pulse] spawn {
 		params ["_camera", "_pulse"];
@@ -184,14 +184,14 @@ if (!isNull _camera && {!_wasDiving}) then {
 
 		if (
 			!isNull _camera
-			&& {_pulse isEqualTo (uiNamespace getVariable ["lancet_geran_fovPulse", -1])}
+			&& {_pulse isEqualTo (uiNamespace getVariable ["geran4_fovPulse", -1])}
 		) then {
-			private _userFov = uiNamespace getVariable ["lancet_geran_userFov", 0.75];
+			private _userFov = uiNamespace getVariable ["geran4_userFov", 0.75];
 			_camera camSetFov _userFov;
 			_camera camCommit 0.45;
 
 			[_userFov, 0.45] call (
-				uiNamespace getVariable ["lancet_geran_setZoomEffects", {}]
+				uiNamespace getVariable ["geran4_setZoomEffects", {}]
 			);
 		};
 	};

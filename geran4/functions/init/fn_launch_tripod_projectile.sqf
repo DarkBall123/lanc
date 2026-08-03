@@ -1,137 +1,91 @@
-params ["_unit", "_gunner", "_uavType", "_isIzdelie", "_isGeran"];
+params ["_unit", "_gunner"];
 
-if (_isGeran) then {
-    _unit setVariable ["lancet_launchPending", false, true];
-    _unit setVariable ["lancet_keepLoadedVisual", false, true];
-    _unit animateSource ["tubel_hide_full", 1, true];
-};
+_unit setVariable ["geran4_launchPending", false, true];
+_unit setVariable ["geran4_keepLoadedVisual", false, true];
+_unit animateSource ["tubel_hide_full", 1, true];
 
 if (!alive _unit || {!alive _gunner}) exitWith {};
 
 private _basePos = AGLToASL (_unit modelToWorld (_unit selectionPosition "konec hlavne"));
 private _muzzlePos = AGLToASL (_unit modelToWorld (_unit selectionPosition "usti hlavne"));
 private _launchPos = _muzzlePos vectorAdd (_basePos vectorFromTo _muzzlePos);
-private _uav = _uavType createVehicle _launchPos;
-_uav setPosASL _launchPos;
-_uav hideObject true;
-[_uav, true] remoteExec ["hideObjectGlobal", 2];
+private _projectile = "m_geran_dummy" createVehicle _launchPos;
+_projectile setPosASL _launchPos;
+_projectile hideObject true;
+[_projectile, true] remoteExec ["hideObjectGlobal", 2];
 
-private _uavTempType = "";
-
-switch (true) do {
-    case ((side _gunner == INDEPENDENT) && {_isGeran}): {
-        _uavTempType = "lancet_geran_uav_i";
-    };
-
-    case ((side _gunner == EAST) && {_isGeran}): {
-        _uavTempType = "lancet_geran_uav_o";
-    };
-
-    case ((side _gunner == WEST) && {_isGeran}): {
-        _uavTempType = "lancet_geran_uav_b";
-    };
-
-    case ((side _gunner == INDEPENDENT) && {!_isIzdelie}): {
-        _uavTempType = "I_uav_lancet3";
-    };
-
-    case ((side _gunner == EAST) && {_isIzdelie}): {
-        _uavTempType = "O_uav_izdelie53";
-    };
-
-    case ((side _gunner == WEST) && {_isIzdelie}): {
-        _uavTempType = "B_uav_izdelie53";
-    };
-
-    case ((side _gunner == WEST) && {!_isIzdelie}): {
-        _uavTempType = "B_uav_lancet3";
-    };
-
-    case ((side _gunner == EAST) && {!_isIzdelie}): {
-        _uavTempType = "O_uav_lancet3";
-    };
-
-    case ((side _gunner == INDEPENDENT) && {_isIzdelie}): {
-        _uavTempType = "I_uav_izdelie53";
-    };
+private _visualType = switch (side _gunner) do {
+	case INDEPENDENT: {"geran_uav_i"};
+	case EAST: {"geran_uav_o"};
+	default {"geran_uav_b"};
 };
 
-private _uavTemp = _uavTempType createVehicle _launchPos;
-createVehicleCrew _uavTemp;
+private _visualUav = _visualType createVehicle _launchPos;
+createVehicleCrew _visualUav;
 
-if (local _uavTemp) then {
-    _uavTemp lockDriver true;
+if (local _visualUav) then {
+	_visualUav lockDriver true;
 } else {
-    [_uavTemp, true] remoteExec ["lockDriver", 0, true];
+	[_visualUav, true] remoteExec ["lockDriver", 0, true];
 };
 
-_uav setVariable ["DB_lancet_subUAV", _uavTemp];
-_uavTemp setVariable ["DB_lancet_parentProjectile", _uav];
+_projectile setVariable ["DB_geran4_visualUAV", _visualUav];
+_visualUav setVariable ["DB_geran4_parentProjectile", _projectile];
+_visualUav attachTo [_projectile, [0, 0, 0]];
+_visualUav addEventHandler ["Killed", {
+	params ["_visualUav"];
 
-_uavTemp attachTo [_uav, [0, 0, 0]];
-_uavTemp addEventHandler ["Killed", {
-    params ["_uavTemp"];
+	private _projectile = _visualUav getVariable ["DB_geran4_parentProjectile", objNull];
+	if (alive _projectile) then {
+		triggerAmmo _projectile;
+	};
 
-    private _projectile = _uavTemp getVariable ["DB_lancet_parentProjectile", objNull];
-
-    if (alive _projectile) then {
-        triggerAmmo _projectile;
-    };
-
-    deleteVehicle _uavTemp;
+	deleteVehicle _visualUav;
 }];
 
-(driver _uavTemp) disableAI "ALL";
-(gunner _uavTemp) disableAI "ALL";
-_uavTemp disableAI "ALL";
+{
+	_x disableAI "ALL";
+} forEach crew _visualUav;
+_visualUav disableAI "ALL";
 
 private _directionVector = _unit weaponDirection (currentWeapon _unit);
-private _directionDegrees = (_directionVector select 0) atan2 (_directionVector select 1);
+private _directionDegrees = (_directionVector # 0) atan2 (_directionVector # 1);
 private _verticalAngle = (atan ((vectorDir _unit) # 2)) max 0;
-_uav setDir _directionDegrees;
+_projectile setDir _directionDegrees;
+_projectile engineOn true;
+_projectile setVehicleAmmo 0;
+[_projectile, [25, 0, direction _projectile]] call geran4_fnc_setAngleOfAttack;
 
-_uav engineOn true;
-_uav setVehicleAmmo 0;
-[_uav, [25, 0, direction _uav]] call lancet_fnc_setAngleOfAttack;
-
-private _direction = direction _uav;
-private _launchSpeed = if (_isGeran) then {90} else {60};
-_uav setVelocity [
-    sin _direction * _launchSpeed,
-    cos _direction * _launchSpeed,
-    50 + _verticalAngle
+private _launchSpeed = 90;
+private _direction = direction _projectile;
+_projectile setVelocity [
+	sin _direction * _launchSpeed,
+	cos _direction * _launchSpeed,
+	50 + _verticalAngle
 ];
-_uav setDamage 0;
+_projectile setDamage 0;
+_projectile setVariable ["geran4_guidanceMode", "MANUAL"];
+_projectile setVariable ["geran4_manualInput", [0, 0]];
+_projectile setVariable ["geran4_manualInputSmoothed", [0, 0]];
 
-if (_isGeran) then {
-    _uav setVariable ["lancet_geran_guidanceMode", "MANUAL"];
-    _uav setVariable ["lancet_geran_manualInput", [0, 0]];
-    _uav setVariable ["lancet_geran_manualInputSmoothed", [0, 0]];
-};
+[_unit, _projectile, [_gunner]] call geran4_fnc_initMissile;
+[_projectile] call geran4_fnc_guideGeran;
 
-private _controlUnits = if (_isGeran) then {[_gunner]} else {[]};
-private _interface = if (_isGeran) then {"geran_seeker"} else {"lancet_seeker"};
-[_unit, _uav, [], 0.65, _interface, _controlUnits] call lancet_fnc_initMissile;
+[_projectile, _verticalAngle, _launchSpeed] spawn {
+	params ["_projectile", "_verticalAngle", "_launchSpeed"];
 
-if (_isGeran) then {
-    [_uav] call lancet_fnc_guideGeran;
-};
+	for "_i" from 1 to 5 do {
+		[_projectile, [25, 0, direction _projectile]] call geran4_fnc_setAngleOfAttack;
 
-[_uav, _verticalAngle, _launchSpeed] spawn {
-    params ["_uav", "_verticalAngle", "_launchSpeed"];
+		private _direction = direction _projectile;
+		_projectile setVelocity [
+			sin _direction * _launchSpeed,
+			cos _direction * _launchSpeed,
+			25 + _verticalAngle
+		];
+		_projectile setDamage 0;
+		sleep 0.2;
+	};
 
-    for "_i" from 1 to 5 do {
-        [_uav, [25, 0, direction _uav]] call lancet_fnc_setAngleOfAttack;
-
-        private _direction = direction _uav;
-        _uav setVelocity [
-            sin _direction * _launchSpeed,
-            cos _direction * _launchSpeed,
-            25 + _verticalAngle
-        ];
-        _uav setDamage 0;
-        sleep 0.2;
-    };
-
-    _uav setDamage 0;
+	_projectile setDamage 0;
 };

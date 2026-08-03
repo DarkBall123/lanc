@@ -1,36 +1,15 @@
-if (!(alive player)) exitWith {};
+if !(alive player) exitWith {};
 
 params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile"];
 
-private _gunner = (getShotParents _projectile) # 1;
-
+private _gunner = (getShotParents _projectile) param [1, objNull];
 deleteVehicle _projectile;
 
-// Locality fix - only spawn lancet on client shooting this, or client controlling this gunner
-private _player = missionNamespace getVariable ["bis_fnc_moduleRemoteControl_unit", player];
+private _controller = missionNamespace getVariable ["bis_fnc_moduleRemoteControl_unit", player];
+if (_gunner isNotEqualTo _controller) exitWith {};
 
-if (_gunner != _player) exitWith {};
+_unit setVariable ["geran4_launchPending", true, true];
+_unit setVariable ["geran4_keepLoadedVisual", true, true];
+_unit animateSource ["tubel_hide_full", 0, true];
 
-private _unitType = typeOf _unit;
-private _isIzdelie = (_unitType find "izdelie") > -1;
-private _isGeran = (_unitType find "geran") > -1;
-private _uavType = "m_lancet_dummy";
-
-if (_isIzdelie) then {
-    _uavType = "m_izdelie_dummy";
-};
-
-if (_isGeran) then {
-    _uavType = "m_geran_dummy";
-};
-
-private _launchArgs = [_unit, _gunner, _uavType, _isIzdelie, _isGeran];
-
-if (_isGeran) then {
-    _unit setVariable ["lancet_launchPending", true, true];
-    _unit setVariable ["lancet_keepLoadedVisual", true, true];
-    _unit animateSource ["tubel_hide_full", 0, true];
-    [lancet_fnc_launch_tripod_projectile, _launchArgs, 14] call CBA_fnc_waitAndExecute;
-} else {
-    _launchArgs call lancet_fnc_launch_tripod_projectile;
-};
+[geran4_fnc_launch_tripod_projectile, [_unit, _gunner], 14] call CBA_fnc_waitAndExecute;

@@ -1,95 +1,40 @@
-_unit 		= param[0, objNull];
-_projectile = param[1, objNull];
-_speedArr 	= param[2, []];
-_offset 	= param[3, 0.65];
-_interface 	= param[4, "lancet_seeker"];
-private _controlUnits = param[5, []];
+params ["_unit", "_projectile", ["_controlUnits", []]];
 
-//Add the action to the unit and it's vehicle if the unit is inside one
-private _unitsAction = if (_controlUnits isEqualTo []) then {
+private _actionUnits = if (_controlUnits isEqualTo []) then {
 	crew (vehicle _unit)
 } else {
 	_controlUnits
 };
-//_unitsAction pushBackUnique (vehicle _unit);
 
-//Init
-_projectile setVariable ["lancet_launchTime", time];
-//Add the action to the whole crew
 {
-	//Adds the main control action
-	_id = _x addAction ["Enable control", {
-		params ["_target", "_caller", "_actionId", "_arguments"];
-		private _unit 		= _arguments # 0;
-		private _projectile = _arguments # 1;
-		private _offset 	= _arguments # 2;
-		private _interface 	= _arguments # 3;
+	private _actionId = _x addAction [
+		"Enable control",
+		{
+			params ["_target", "_caller", "_actionId", "_arguments"];
+			private _projectile = _arguments # 0;
+			[_projectile, 2, [], "geran_seeker"] spawn geran4_fnc_handleGeranMissile;
+		},
+		[_projectile],
+		10,
+		true,
+		false,
+		"",
+		"",
+		5,
+		false
+	];
 
-		if (_interface isEqualTo "geran_seeker") then {
-			[_projectile, _offset, [], _interface] spawn lancet_fnc_handleGeranMissile;
-		} else {
-			[_projectile, _offset, [], _interface] spawn lancet_fnc_handleMissile;
+	[_projectile, _actionId, _x] spawn {
+		params ["_projectile", "_actionId", "_unit"];
+		waitUntil {
+			sleep 0.25;
+			!alive _projectile
 		};
-	}, [_x, _projectile, _offset, _interface], 10, true, false, "","", 5, false];
-
-	//Clean the action if the proj dies
-	[_projectile, _id, _x] spawn {
-		private _projectile = _this #0;
-		private _actionId = _this # 1;
-		private _unit 	= _this # 2;
-
-		waitUntil {!alive _projectile};
 		_unit removeAction _actionId;
 	};
-}forEach _unitsAction;
+} forEach _actionUnits;
 
-//Speed, override speed only for missiles with presets
-if(_speedArr isEqualTo []) then {
-	_speedArr = getArray (configOf _projectile >> "lancet_speedArray");
-};
-//found something
-if(count _speedArr > 0) then {
-	[_projectile, _speedArr] spawn lancet_fnc_handleSpeed;
-};
-
-//Autolevel 
-if(isTouchingGround _unit) then {
-	[_projectile, _unit] spawn {
-		params["_projectile", "_unit"];
-		private _altUnit = (getPosASL _unit) # 2;
-		private _targetAlt = _altUnit + 350;
-
-		waitUntil {
-			(((getPosASL _projectile) # 2) > _targetAlt)
-				or (!alive _projectile)
-				or ((_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isNotEqualTo "CRUISE")
-		};
-		if (
-			!alive _projectile
-				or ((_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isNotEqualTo "CRUISE")
-		) exitWith {};
-
-		private _vDirTgt = vectorDir _projectile;
-		_vDirTgt set [2,0];
-
-		//Projectile 
-		private _vUpProj 	= vectorUp _projectile;
-		private _vDirProj	= vectorDir _projectile;
-
-		//Handle moving the missile
-		_id = ["lancet_handleMissileLevel", "onEachFrame", {
-			params[ "_projectile","_timeArr", "_vUpArr", "_vDirArr"];
-			if ((_projectile getVariable ["lancet_geran_guidanceMode", "CRUISE"]) isEqualTo "CRUISE") then {
-				_vDir = vectorLinearConversion [_timeArr # 0, _timeArr # 1, time, _vDirArr # 0, _vDirArr # 1];
-				_vUp  = vectorLinearConversion [_timeArr # 0, _timeArr # 1, time, _vUpArr # 0, _vUpArr # 1];
-				_projectile setVectorDirAndUp [_vDir, _vUp];
-			};
-		}, [_projectile, [time, time + 1.5], [_vUpProj, [0,0,1]], [_vDirProj, _vDirTgt]]] call BIS_fnc_addStackedEventHandler;
-
-		private _timeZero = time;
-		waitUntil {
-			!(alive _projectile) or (time - _timeZero) > 1.5
-		};
-		[_id, "onEachFrame"] call BIS_fnc_removeStackedEventHandler;
-	};
+private _speedArray = getArray (configOf _projectile >> "geranSpeedArray");
+if (_speedArray isNotEqualTo []) then {
+	[_projectile, _speedArray] spawn geran4_fnc_handleSpeed;
 };
