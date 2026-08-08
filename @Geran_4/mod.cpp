@@ -1,0 +1,16 @@
+name = "Geran-4";
+picture = "mod.paa";
+logo = "mod.paa";
+logoOver = "mod.paa";
+logoSmall = "mod_small.paa";
+tooltip = "Geran-4";
+tooltipOwned = "Geran-4";
+actionName = "GitHub";
+action = "https://github.com/DarkBall123/lanc";
+description = "Geran-4 launcher and guidance system for Arma 3. Requires CBA_A3.";
+overview = "Geran-4 launcher and guidance system for Arma 3. Requires CBA_A3.";
+author = "DarkBall";
+overviewPicture = "mod.paa";
+overviewText = "Geran-4 launcher and guidance system for Arma 3. Requires CBA_A3.";
+hideName = 0;
+hidePicture = 0;
